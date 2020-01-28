@@ -1,5 +1,9 @@
 //----------------------------------HELPER FUNCTIONS----------------------------------------------------------------------------------------------
+function testIndexes(){
+  Logger.log(getMainPageIndexes())
+  Logger.log(getContactPageIndexes())
 
+}
 
 //Indexes are stored in the script properties, so they're more editable.
 //Calling this function returns an object that can be used for indexing
@@ -24,12 +28,60 @@ function getMainPageIndexes(){
     indexHumanIssues : parseInt(indexes.getProperty('indexMainPageResolved')),
     indexSuppliesNotes : parseInt(indexes.getProperty('indexMainPageSuppliesNotes')),
     indexIncompleteSupplies : parseInt(indexes.getProperty('indexMainPageSuppliesRequested')),
-    indexActualIssues : parseInt(indexes.getProperty('indexMainPageIssues'))
+    indexActualIssues : parseInt(indexes.getProperty('indexMainPageIssues')),
+    index_pickup : parseInt(indexes.getProperty('indexMainPageLocation')),
+    indexRawFax : parseInt(indexes.getProperty('indexMainPageContactType')),
+    indexEmailOne : parseInt(indexes.getProperty('indexMainPageEmailOne')),
+    indexEmailTwo : parseInt(indexes.getProperty('indexMainPageEmailTwo')),
+    indexEmailThree : parseInt(indexes.getProperty('indexMainPageEmailThree')),
+    indexLogger : parseInt(indexes.getProperty('indexMainPageLogger')),
+    indexRowID : parseInt(indexes.getProperty('indexMainPageRowID')),
+    indexIssues : parseInt(indexes.getProperty('indexMainPageUpdateCol')),
+    indexEmailAddr : parseInt(indexes.getProperty('indexMainPageEmailAddresses'))
+
    }
   
   return res_obj
 }
 
+//Same as contact page
+function getContactPageIndexes(){
+  var indexes = PropertiesService.getScriptProperties()  
+
+  var res_obj = {
+    indexArchived : parseInt(indexes.getProperty('indexMainPageArchive')),
+    indexFaxnumber : parseInt(indexes.getProperty('indexContactPageFaxNumber')),
+    indexFacility : parseInt(indexes.getProperty('indexContactPageFacility')),
+    indexState : parseInt(indexes.getProperty('indexContactPageState')),
+    indexPickup : parseInt(indexes.getProperty('indexContactPagePickup')),
+    indexIssue : parseInt(indexes.getProperty('indexContactPageIssue')),
+    indexContact : parseInt(indexes.getProperty('indexContactPageContact')),
+    indexId : parseInt(indexes.getProperty('indexContactPageID')),
+    indexLastDonationDate : parseInt(indexes.getProperty('indexContactPageLastDate')),
+    indexSuppliesNotes : parseInt(indexes.getProperty('indexContactPageSuppliesNote')),
+    indexSalesforceContacts : parseInt(indexes.getProperty('indexContactPageSalesforceContact')),
+    indexImportFormat : parseInt(indexes.getProperty('indexContactPageImportFormat')),
+    indexAllEmails : parseInt(indexes.getProperty('indexContactPageFacilityEmails')),
+
+  }
+  
+  return res_obj
+
+}
+
+
+
+//TODO: add indexes to property and build this out
+function getPickupSheetIndexes(){
+  var indexes = PropertiesService.getScriptProperties()  
+
+  var res_obj = {
+    //TODO here
+  }
+  
+  return res_obj
+
+}
 
 
 

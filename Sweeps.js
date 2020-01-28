@@ -28,6 +28,9 @@ function issueSweep(start){
     
   var indexes = PropertiesService.getScriptProperties()  
   
+  var indexesMain = getMainPageIndexes()
+  var indexesContact = getContactPageIndexes()
+  
   var index_facility = parseInt(indexes.getProperty('indexMainPageFacilityName'))
   var index_action = parseInt(indexes.getProperty('indexMainPageAction'))
   var index_shipped = parseInt(indexes.getProperty('indexMainPageShippedEmail'))
@@ -346,6 +349,7 @@ function checkForDups(){
   var db_data = tracking_db.getDataRange().getValues()
   
   var indexes = PropertiesService.getScriptProperties()  
+  
   var index_facility = parseInt(indexes.getProperty('indexMainPageFacilityName'))
   var index_action = parseInt(indexes.getProperty('indexMainPageAction'))
   var index_shipped = parseInt(indexes.getProperty('indexMainPageShippedEmail'))

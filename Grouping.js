@@ -1,10 +1,11 @@
 
 //Triggered by button, useful for supply requests
 function manualGroup(){
+    
+  var indexes = getMainPageIndexes()
   
-  var indexes = PropertiesService.getScriptProperties()  
-  var indexFacilityName = parseInt(indexes.getProperty('indexMainPageFacilityName'))
-  var indexLogger = parseInt(indexes.getProperty('indexMainPageLogger'))
+  var indexFacilityName = indexes.indexFacilityName
+  var indexLogger = indexes.indexLogger
   
   var sh = SpreadsheetApp.openById(BERTHA_ID).getSheetByName("1 - Main Page")
   
@@ -51,9 +52,9 @@ function manualGroup(){
 //and move them down to group with the new row (they'll appear right chronologically before the new row & maintain their ordering)
 function autoGroup(name){
   
-  var indexes = PropertiesService.getScriptProperties()  
-  var indexFacilityName = parseInt(indexes.getProperty('indexMainPageFacilityName'))
-  var indexLogger = parseInt(indexes.getProperty('indexMainPageLogger'))
+  var indexes = getMainPageIndexes()
+  var indexFacilityName = indexes.indexFacilityName
+  var indexLogger = indexes.indexLogger
   
   var sh = SpreadsheetApp.openById(BERTHA_ID).getSheetByName("1 - Main Page")
 
@@ -104,8 +105,9 @@ function autoGroup(name){
 //and move them down to group with the new row (they'll appear right chronologically before the new row & maintain their ordering)
 function autoGroupSupplies(name){
   
-  var indexes = PropertiesService.getScriptProperties()  
-  var indexFacilityName = parseInt(indexes.getProperty('indexMainPageFacilityName'))
+  var indexes = getMainPageIndexes()
+  var indexFacilityName = indexes.indexFacilityName
+  var indexLogger = indexes.indexLogger
   
   var sh = SpreadsheetApp.openById(BERTHA_ID).getSheetByName("Supplies Page")
   var data = sh.getDataRange().getValues()

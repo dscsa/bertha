@@ -3,12 +3,12 @@
 function performMainPageTagging(obj_to_process, main_page){
   var completed = []
   
-  var indexes = PropertiesService.getScriptProperties()  
-  var indexSFaxInfo = parseInt(indexes.getProperty('indexMainPageContactType'))
-  var indexManualTrackingNum = parseInt(indexes.getProperty('indexMainPageManualTrackingNum'))
-  var indexActualIssues = parseInt(indexes.getProperty('indexMainPageIssues'))
-  var indexInSirum = parseInt(indexes.getProperty('indexMainPageInSirum')) //this is where we have the way we get data to V1 for each row
-  var indexFacilityName = parseInt(indexes.getProperty('indexMainPageFacilityName'))
+  var indexes = getMainPageIndexes()
+  var indexSFaxInfo = indexes.indexRawFax
+  var indexManualTrackingNum = indexes.indexColemanTracking
+  var indexActualIssues = indexes.indexActualIssues 
+  var indexInSirum = indexes.indexInSirum
+  var indexFacilityName = indexes.indexFacilityName
 
   var page_data = main_page.getDataRange().getValues()
   for(var i = 1; i < page_data.length; i++){

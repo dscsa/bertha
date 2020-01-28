@@ -35,14 +35,17 @@ function sendEmailsFromMainSheet(){
   
   var today = Utilities.formatDate(new Date(), "GMT-07:00", "MM/dd/yyyy hh:mm:ss").toString()
 
-  var indexes = PropertiesService.getScriptProperties()  
-  var indexPend = parseInt(indexes.getProperty('indexMainPageAction'))
-  var indexTrackingNum = parseInt(indexes.getProperty('indexMainPageAutoTrackingNum'))
-  var indexFacilityName = parseInt(indexes.getProperty('indexMainPageFacilityName'))
-  var indexEmailAddr = parseInt(indexes.getProperty('indexMainPageEmailAddresses'))
-  var indexEmailOne = parseInt(indexes.getProperty('indexMainPageEmailOne'))
-  var indexEmailTwo = parseInt(indexes.getProperty('indexMainPageEmailTwo'))
-  var indexEmailThree = parseInt(indexes.getProperty('indexMainPageEmailThree'))
+  var indexes = getMainPageIndexes()
+  //TODO: don't need these variables to be declared, just access indexes directly
+  var indexPend = indexes.indexPend
+  var indexFacilityName = indexes.indexFacilityName
+  var indexEmailAddr = indexes.indexEmailAddr   
+  var indexEmailOne = indexes.indexEmailOne 
+  var indexEmailTwo = indexes.indexEmailTwo 
+  var indexEmailThree = indexes.indexEmailThree 
+  var indexTrackingNum = indexes.indexTrackingNum 
+
+  
   
   for(var i = 1; i < data.length; i++){
     if((data[i][indexPend].toString().indexOf("DO NOT PEND") == -1) && (data[i][indexPend].toString().indexOf("SUPPLY REQUEST") == -1)){ //just make sure
@@ -143,14 +146,16 @@ function createDraftEmails(ss,code, facility,location,original_contact,pickup_da
   var subject = ""
   var fax_addon = ""
   var emails_to_use = ""
-  var indexes = PropertiesService.getScriptProperties()  
-  var indexPend = parseInt(indexes.getProperty('indexMainPageAction'))
-  var indexFacilityName = parseInt(indexes.getProperty('indexMainPageFacilityName'))
-  var indexEmailAddr = parseInt(indexes.getProperty('indexMainPageEmailAddresses'))
-  var indexEmailOne = parseInt(indexes.getProperty('indexMainPageEmailOne'))
-  var indexEmailTwo = parseInt(indexes.getProperty('indexMainPageEmailTwo'))
-  var indexEmailThree = parseInt(indexes.getProperty('indexMainPageEmailThree'))
-  var indexTrackingNum = parseInt(indexes.getProperty('indexMainPageAutoTrackingNum'))
+  
+  var indexes = getMainPageIndexes()
+  //TODO: don't need these variables to be declared, just access indexes directly
+  var indexPend = indexes.indexPend
+  var indexFacilityName = indexes.indexFacilityName
+  var indexEmailAddr = indexes.indexEmailAddr   
+  var indexEmailOne = indexes.indexEmailOne 
+  var indexEmailTwo = indexes.indexEmailTwo 
+  var indexEmailThree = indexes.indexEmailThree 
+  var indexTrackingNum = indexes.indexTrackingNum 
 
   var data_val_data = ss.getSheetByName("Data Validation").getDataRange().getValues()
   var index_one = data_val_data[0].indexOf("FIRST EMAIL INFO")

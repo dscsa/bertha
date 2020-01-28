@@ -22,18 +22,16 @@ function updateDonorIds() {
   var contact_data = contact_sheet.getDataRange().getValues()
   var body = "I updated the donor id's for the following facility rows\n"
   
-  var indexes = PropertiesService.getScriptProperties()  
-  var contactsheet_index_facility = parseInt(indexes.getProperty('indexContactPageFacility'))
-  var contactsheet_index_id = parseInt(indexes.getProperty('indexContactPageID'))
-
+  var indexes = getContactPageIndexes()
+    
   for(var i = 0; i < contact_data.length; i++){
-    var row_fac = contact_data[i][contactsheet_index_facility].toString().trim()
+    var row_fac = contact_data[i][indexes.indexFacility].toString().trim()
     var ind = facility_arr.indexOf(row_fac)
     if(ind > -1){
-      var contact_sheet_id = contact_data[i][contactsheet_index_id].toString().trim()
+      var contact_sheet_id = contact_data[i][indexes.indexId].toString().trim()
       if(contact_sheet_id.length == 0){
         body += "\n Facility: " + row_fac + "; New Id: " + id_arr[ind]
-        contact_sheet.getRange((i+1),(contactsheet_index_id + 1)).setValue(id_arr[ind])
+        contact_sheet.getRange((i+1),(indexes.indexId + 1)).setValue(id_arr[ind])
       }
     }
   }

@@ -6,8 +6,8 @@ function checkFedexSummary(content, main_page,ss) {
   //go to the main page, and confirm that they're all their
   var page_data = main_page.getDataRange().getValues()
   
-  var indexes = PropertiesService.getScriptProperties()  
-  var index_tracking_number = parseInt(indexes.getProperty('indexMainPageAutoTrackingNum'))
+  var indexes = getMainPageIndexes()
+  var index_tracking_number = indexes.indexTrackingNum
   
   for(var i = 0; i < page_data.length; i++){
     if(page_data[i][index_tracking_number].toString().trim().length == 0) continue;
