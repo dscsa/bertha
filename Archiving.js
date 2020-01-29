@@ -188,23 +188,23 @@ function archiveSupplies(){
 
 //MANUALLY TRIGGERED
 function storeSupplies(){
-  var indexes = PropertiesService.getScriptProperties()  
+  var indexes = getMainPageIndexes()  
   
-  var indexArchived = parseInt(indexes.getProperty('indexMainPageArchive'))
-  var indexPend = parseInt(indexes.getProperty('indexMainPageAction'))
-  var indexFacilityName = parseInt(indexes.getProperty('indexMainPageFacilityName'))
-  var indexState = parseInt(indexes.getProperty('indexMainPageState'))
-  var indexIssues = parseInt(indexes.getProperty('indexMainPageHistoriceIssues'))
-  var indexContact = parseInt(indexes.getProperty('indexMainPageContact'))
-  var indexTrackingNum = parseInt(indexes.getProperty('indexMainPageAutoTrackingNum'))
-  var indexCOFwd = parseInt(indexes.getProperty('indexMainPageCOFWD'))
-  var indexShippedEmail = parseInt(indexes.getProperty('indexMainPageShippedEmail'))
-  var indexReceivedEmail = parseInt(indexes.getProperty('indexMainPageReceivedEmail'))
-  var indexInSirum = parseInt(indexes.getProperty('indexMainPageInSirum'))
-  var indexColemanTracking = parseInt(indexes.getProperty('indexMainPageManualTrackingNum'))
-  var indexHumanIssues = parseInt(indexes.getProperty('indexMainPageResolved'))
-  var indexSuppliesNotes = parseInt(indexes.getProperty('indexMainPageSuppliesNotes'))
-  var indexIncompleteSupplies = parseInt(indexes.getProperty('indexMainPageSuppliesRequested'))
+  var indexArchived = indexes.indexArchived
+  var indexPend = indexes.indexPend
+  var indexFacilityName = indexes.indexFacilityName
+  var indexState = indexes.indexState
+  var indexIssues = indexes.indexIssues
+  var indexContact = indexes.indexContact
+  var indexTrackingNum = indexes.indexTrackingNum
+  var indexCOFwd = indexes.indexCOFwd
+  var indexShippedEmail = indexes.indexShippedEmail
+  var indexReceivedEmail = indexes.indexReceivedEmail
+  var indexInSirum = indexes.indexInSirum
+  var indexColemanTracking = indexes.indexColemanTracking
+  var indexHumanIssues = indexes.indexHumanIssues
+  var indexSuppliesNotes = indexes.indexSuppliesNotes
+  var indexIncompleteSupplies = indexes.indexIncompleteSupplies
   
   var sh = SpreadsheetApp.openById(BERTHA_ID)
   var main_page = sh.getSheetByName("1 - Main Page")

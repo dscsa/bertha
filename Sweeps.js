@@ -26,37 +26,36 @@ function issueSweep(start){
   var days_to_wait_for_pickup = 1  //could, down the road, pull from an extra variable sheet, so nobody needs to edit the script
   var days_to_wait_for_arrival = 7
     
-  var indexes = PropertiesService.getScriptProperties()  
   
-  var indexesMain = getMainPageIndexes()
-  var indexesContact = getContactPageIndexes()
+  var main_indexes = getMainPageIndexes()
+  var contact_indexes = getContactPageIndexes()
   
-  var index_facility = parseInt(indexes.getProperty('indexMainPageFacilityName'))
-  var index_action = parseInt(indexes.getProperty('indexMainPageAction'))
-  var index_shipped = parseInt(indexes.getProperty('indexMainPageShippedEmail'))
-  var index_received = parseInt(indexes.getProperty('indexMainPageReceivedEmail'))
-  var indexRowID = parseInt(indexes.getProperty('indexMainPageRowID'))
-  var index_notes = parseInt(indexes.getProperty('indexMainPageIssues'))
-  var index_co = parseInt(indexes.getProperty('indexMainPageCOFWD'))
-  var indexState = parseInt(indexes.getProperty('indexMainPageState'))
-  var indexColemanTracking = parseInt(indexes.getProperty('indexMainPageManualTrackingNum'))
-  var indexResolved = parseInt(indexes.getProperty('indexMainPageResolved'))
-  var indexInSirum = parseInt(indexes.getProperty('indexMainPageInSirum'))
-  var indexContact = parseInt(indexes.getProperty('indexMainPageContact'))
-  var indexRawFax = parseInt(indexes.getProperty('indexMainPageContactType'))
+  var index_facility = main_indexes.indexFacilityName
+  var index_action = main_indexes.indexPend
+  var index_shipped = main_indexes.indexShippedEmail
+  var index_received = main_indexes.indexReceivedEmail
+  var indexRowID = main_indexes.indexRowID
+  var index_notes = main_indexes.indexActualIssues
+  var index_co = main_indexes.indexCOFwd
+  var indexState = main_indexes.indexState
+  var indexColemanTracking = main_indexes.indexColemanTracking
+  var indexResolved = main_indexes.indexHumanIssues
+  var indexInSirum = main_indexes.indexInSirum
+  var indexContact = main_indexes.indexContact
+  var indexRawFax = main_indexes.indexRawFax
 
-  var contactsheet_index_faxnumber = parseInt(indexes.getProperty('indexContactPageFaxNumber'))
-  var contactsheet_index_facility = parseInt(indexes.getProperty('indexContactPageFacility'))
-  var contactsheet_index_state = parseInt(indexes.getProperty('indexContactPageState'))
-  var contactsheet_index_pickup = parseInt(indexes.getProperty('indexContactPagePickup'))
-  var contactsheet_index_issue = parseInt(indexes.getProperty('indexContactPageIssue'))
-  var contactsheet_index_contact = parseInt(indexes.getProperty('indexContactPageContact'))
-  var contactsheet_index_id = parseInt(indexes.getProperty('indexContactPageID'))
-  var contactsheet_index_last_donation_date = parseInt(indexes.getProperty('indexContactPageLastDate'))
-  var contactsheet_index_supplies_notes = parseInt(indexes.getProperty('indexContactPageSuppliesNote'))
-  var contactsheet_index_salesforce_contacts = parseInt(indexes.getProperty('indexContactPageSalesforceContact'))
-  var contactsheet_index_import_format = parseInt(indexes.getProperty('indexContactPageImportFormat'))
-  var contactsheet_index_all_emails = parseInt(indexes.getProperty('indexContactPageFacilityEmails'))
+  var contactsheet_index_faxnumber = contact_indexes.indexFaxnumber
+  var contactsheet_index_facility = contact_indexes.indexFacility
+  var contactsheet_index_state = contact_indexes.indexState
+  var contactsheet_index_pickup = contact_indexes.indexPickup
+  var contactsheet_index_issue = contact_indexes.indexIssue
+  var contactsheet_index_contact = contact_indexes.indexContact
+  var contactsheet_index_id = contact_indexes.indexId
+  var contactsheet_index_last_donation_date = contact_indexes.indexLastDonationDate
+  var contactsheet_index_supplies_notes = contact_indexes.indexSuppliesNotes
+  var contactsheet_index_salesforce_contacts = contact_indexes.indexSalesforceContacts
+  var contactsheet_index_import_format = contact_indexes.indexImportFormat
+  var contactsheet_index_all_emails = contact_indexes.indexAllEmails
 
   
   var pharmacy_list = getPharmacyNames(data_val_page)
@@ -348,14 +347,14 @@ function checkForDups(){
   var main_sheet_data = main_sheet.getDataRange().getValues()
   var db_data = tracking_db.getDataRange().getValues()
   
-  var indexes = PropertiesService.getScriptProperties()  
+  var indexes = getMainPageIndexes()
   
-  var index_facility = parseInt(indexes.getProperty('indexMainPageFacilityName'))
-  var index_action = parseInt(indexes.getProperty('indexMainPageAction'))
-  var index_shipped = parseInt(indexes.getProperty('indexMainPageShippedEmail'))
-  var indexRowID = parseInt(indexes.getProperty('indexMainPageRowID'))
-  var index_notes = parseInt(indexes.getProperty('indexMainPageIssues'))
-  var indexColemanTracking = parseInt(indexes.getProperty('indexMainPageManualTrackingNum'))
+  var index_facility = indexes.indexFacilityName
+  var index_action = indexes.indexPend
+  var index_shipped = indexes.indexShippedEmail
+  var indexRowID = indexes.indexRowID
+  var index_notes = indexes.indexActualIssues
+  var indexColemanTracking = indexes.indexColemanTracking
       
   for(var i = 0; i < main_sheet_data.length; i++){
       if(main_sheet_data[i][index_shipped].toString().length == 0){ //if reused, then this would never fill

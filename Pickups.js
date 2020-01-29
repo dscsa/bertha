@@ -40,30 +40,31 @@ function pendPickups(start){
   var contact_data = contact_sheet.getDataRange().getValues()
 
   //get pickup and issue from the main sheet, not contacts. Only get id from contacts.   
-  var indexes = PropertiesService.getScriptProperties()  
+  var main_indexes = getMainPageIndexes()  
   
-  var indexFacility = parseInt(indexes.getProperty('indexMainPageFacilityName'))
-  var indexPickup = parseInt(indexes.getProperty('indexMainPageLocation'))
-  var indexContact = parseInt(indexes.getProperty('indexMainPageContact'))
-  var indexIssue = parseInt(indexes.getProperty('indexMainPageHistoriceIssues'))
-  var indexRawFax = parseInt(indexes.getProperty('indexMainPageContactType'))
-  var indexAction = parseInt(indexes.getProperty('indexMainPageAction'))
-  var indexInSirum = parseInt(indexes.getProperty('indexMainPageInSirum'))
+  var indexFacility = indexes.indexFacilityName
+  var indexPickup = indexes.index_pickup
+  var indexContact = indexes.indexContact
+  var indexIssue = indexes.indexIssues
+  var indexRawFax = indexes.indexRawFax
+  var indexAction = indexes.indexPend
+  var indexInSirum = indexes.indexInSirum
 
   
-    
-  var contactsheet_index_faxnumber = parseInt(indexes.getProperty('indexContactPageFaxNumber'))
-  var contactsheet_index_facility = parseInt(indexes.getProperty('indexContactPageFacility'))
-  var contactsheet_index_state = parseInt(indexes.getProperty('indexContactPageState'))
-  var contactsheet_index_pickup = parseInt(indexes.getProperty('indexContactPagePickup'))
-  var contactsheet_index_issue = parseInt(indexes.getProperty('indexContactPageIssue'))
-  var contactsheet_index_contact = parseInt(indexes.getProperty('indexContactPageContact'))
-  var contactsheet_index_id = parseInt(indexes.getProperty('indexContactPageID'))
-  var contactsheet_index_last_donation_date = parseInt(indexes.getProperty('indexContactPageLastDate'))
-  var contactsheet_index_supplies_notes = parseInt(indexes.getProperty('indexContactPageSuppliesNote'))
-  var contactsheet_index_salesforce_contacts = parseInt(indexes.getProperty('indexContactPageSalesforceContact'))
-  var contactsheet_index_import_format = parseInt(indexes.getProperty('indexContactPageImportFormat'))
-  var contactsheet_index_all_emails = parseInt(indexes.getProperty('indexContactPageFacilityEmails'))
+  var contact_indexes = getContactPageIndexes()
+  
+  var contactsheet_index_faxnumber = contact_indexes.indexFaxnumber
+  var contactsheet_index_facility = contact_indexes.indexFacility
+  var contactsheet_index_state = contact_indexes.indexState
+  var contactsheet_index_pickup = contact_indexes.indexPickup
+  var contactsheet_index_issue = contact_indexes.indexIssue
+  var contactsheet_index_contact = contact_indexes.indexContact
+  var contactsheet_index_id = contact_indexes.indexId
+  var contactsheet_index_last_donation_date = contact_indexes.indexLastDonationDate
+  var contactsheet_index_supplies_notes = contact_indexes.indexSuppliesNotes
+  var contactsheet_index_salesforce_contacts = contact_indexes.indexSalesforceContacts
+  var contactsheet_index_import_format = contact_indexes.indexImportFormat
+  var contactsheet_index_all_emails = contact_indexes.indexAllEmails
 
   
   for(var n=0;n<main_data.length;++n){           

@@ -49,7 +49,6 @@ function getContactPageIndexes(){
   var indexes = PropertiesService.getScriptProperties()  
 
   var res_obj = {
-    indexArchived : parseInt(indexes.getProperty('indexMainPageArchive')),
     indexFaxnumber : parseInt(indexes.getProperty('indexContactPageFaxNumber')),
     indexFacility : parseInt(indexes.getProperty('indexContactPageFacility')),
     indexState : parseInt(indexes.getProperty('indexContactPageState')),
@@ -203,17 +202,17 @@ function duplicateRowBelow(page,n){
      page.insertRowAfter(n+1)
      var data = page.getDataRange().getValues();
 
-     var indexes = PropertiesService.getScriptProperties()  
-     var index_action = parseInt(indexes.getProperty('indexMainPageAction'))
-     var index_logger = parseInt(indexes.getProperty('indexMainPageLogger'))
-     var index_facility_name = parseInt(indexes.getProperty('indexMainPageFacilityName'))
-     var index_state = parseInt(indexes.getProperty('indexMainPageState'))
-     var index_historic_issues = parseInt(indexes.getProperty('indexMainPageHistoriceIssues'))
-     var index_contact = parseInt(indexes.getProperty('indexMainPageContact'))
-     var index_pickup = parseInt(indexes.getProperty('indexMainPageLocation'))
-     var index_shipped = parseInt(indexes.getProperty('indexMainPageShippedEmail'))
-     var index_in_sirum = parseInt(indexes.getProperty('indexMainPageInSirum'))
-     var indexColemanTracking = parseInt(indexes.getProperty('indexMainPageManualTrackingNum'))
+     var indexes = getMainPageIndexes()
+     var index_action = indexes.indexPend
+     var index_logger = indexes.indexLogger
+     var index_facility_name = indexes.indexFacilityName
+     var index_state = indexes.indexState
+     var index_historic_issues = indexes.indexIssues
+     var index_contact = indexes.indexContact
+     var index_pickup = indexes.index_pickup
+     var index_shipped = indexes.indexShippedEmail
+     var index_in_sirum = indexes.indexInSirum
+     var indexColemanTracking = indexes.indexColemanTracking
 
      page.getRange((n+2),(indexColemanTracking+1)).setValue("autopopulated #NO b/c multiple boxes shipped with 1 fax")
      page.getRange((n+2),(index_action+1)).setValue(data[n][index_action].trim())

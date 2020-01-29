@@ -120,9 +120,9 @@ function dealWithMissedPickups(content, main_page){
   var current_sheet_data = main_page.getDataRange().getValues();
   var facility = content.substring(content.indexOf("from ")+5,content.indexOf(" was not picked up")).replace(/(\r\n|\n|\r)/gm," ").trim()
   
-  var indexes = PropertiesService.getScriptProperties()  
-  var index_tracking_number = parseInt(indexes.getProperty('indexMainPageAutoTrackingNum'))
-  var index_facility = parseInt(indexes.getProperty('indexMainPageFacilityName'))
+  var indexes = getMainPageIndexes()  
+  var index_tracking_number = indexes.indexTrackingNum
+  var index_facility = indexes.indexFacilityName
   var found = false
     
   for(var n=0;n<current_sheet_data.length;++n){  //find the row of this donation by finding tracking number      
@@ -176,26 +176,26 @@ function dealWithShipped(content, main_page, pending_page, contact_sheet,data_va
   var from_facility = content.substring(content.indexOf("from")+5, content.indexOf("was")).replace(/(\r\n|\n|\r)/gm," ").replace(/ +(?= )/g,''," ").trim() //has to remove magic newline characters for some reason
   var current_sheet_data = main_page.getDataRange().getValues();
   
-  var indexes = PropertiesService.getScriptProperties()  
-  var index_tracking_number = parseInt(indexes.getProperty('indexMainPageAutoTrackingNum'))
-  var index_shipped = parseInt(indexes.getProperty('indexMainPageShippedEmail'))
-  var index_facility = parseInt(indexes.getProperty('indexMainPageFacilityName'))
-  var index_action = parseInt(indexes.getProperty('indexMainPageAction'))
-  var index_resolved =  parseInt(indexes.getProperty('indexMainPageResolved'))
+  var main_indexes = getMainPageIndexes()
+  var index_tracking_number = main_indexes.indexTrackingNum
+  var index_shipped = main_indexes.indexShippedEmail
+  var index_facility = main_indexes.indexFacilityName
+  var index_action = main_indexes.indexPend
+  var index_resolved =  main_indexes.indexHumanIssues
 
-    
-  var contactsheet_index_faxnumber = parseInt(indexes.getProperty('indexContactPageFaxNumber'))
-  var contactsheet_index_facility = parseInt(indexes.getProperty('indexContactPageFacility'))
-  var contactsheet_index_state = parseInt(indexes.getProperty('indexContactPageState'))
-  var contactsheet_index_pickup = parseInt(indexes.getProperty('indexContactPagePickup'))
-  var contactsheet_index_issue = parseInt(indexes.getProperty('indexContactPageIssue'))
-  var contactsheet_index_contact = parseInt(indexes.getProperty('indexContactPageContact'))
-  var contactsheet_index_id = parseInt(indexes.getProperty('indexContactPageID'))
-  var contactsheet_index_last_donation_date = parseInt(indexes.getProperty('indexContactPageLastDate'))
-  var contactsheet_index_supplies_notes = parseInt(indexes.getProperty('indexContactPageSuppliesNote'))
-  var contactsheet_index_salesforce_contacts = parseInt(indexes.getProperty('indexContactPageSalesforceContact'))
-  var contactsheet_index_import_format = parseInt(indexes.getProperty('indexContactPageImportFormat'))
-  var contactsheet_index_all_emails = parseInt(indexes.getProperty('indexContactPageFacilityEmails'))
+  var contact_indexes = getContactPageIndexes()
+  var contactsheet_index_faxnumber = contact_indexes.indexFaxnumber
+  var contactsheet_index_facility = contact_indexes.indexFacility
+  var contactsheet_index_state = contact_indexes.indexState
+  var contactsheet_index_pickup = contact_indexes.indexPickup
+  var contactsheet_index_issue = contact_indexes.indexIssue
+  var contactsheet_index_contact = contact_indexes.indexContact
+  var contactsheet_index_id = contact_indexes.indexId
+  var contactsheet_index_last_donation_date = contact_indexes.indexLastDonationDate
+  var contactsheet_index_supplies_notes = contact_indexes.indexSuppliesNotes
+  var contactsheet_index_salesforce_contacts = contact_indexes.indexSalesforceContacts
+  var contactsheet_index_import_format = contact_indexes.indexImportFormat
+  var contactsheet_index_all_emails = contact_indexes.indexAllEmails
 
 
   
@@ -368,10 +368,10 @@ function dealWithReceived(content, main_page){
     var current_sheet_data = main_page.getDataRange().getValues();
     var facility = content.substring(content.indexOf(",")+2,content.indexOf("'s"))
     
-    var indexes = PropertiesService.getScriptProperties()  
-    var index_tracking_number = parseInt(indexes.getProperty('indexMainPageAutoTrackingNum'))
-    var index_received = parseInt(indexes.getProperty('indexMainPageReceivedEmail'))
-    //var indexColemanTracking = parseInt(indexes.getProperty('indexMainPageManualTrackingNum'))
+    var indexes = getMainPageIndexes()  
+    var index_tracking_number = indexes.indexTrackingNum
+    var index_received = indexes.indexReceivedEmail
+    //var indexColemanTracking = indexes.indexColemanTracking
 
     var found = 0
     
@@ -418,8 +418,8 @@ function logDonationByEmail(content, contact_sheet, main_page){
     if(supplies_requested) supplies = content.substring(content.indexOf("Supplies:")+9, content.indexOf("END")).trim()
   }  
   
-  var indexes = PropertiesService.getScriptProperties()  
-  var index_contact = parseInt(indexes.getProperty('indexMainPageContact'))
+  var indexes = getMainPageIndexes()  
+  var index_contact = indexes.indexContact
   
   var res = 1;
   var fake_number = "Email-Log"
@@ -502,20 +502,20 @@ function nameContactLookup(name, contact_sheet){
   var res = []
   var data = contact_sheet.getDataRange().getValues()
   
-  var indexes = PropertiesService.getScriptProperties()  
+  var indexes = getContactPageIndexes()  
 
-  var contactsheet_index_faxnumber = parseInt(indexes.getProperty('indexContactPageFaxNumber'))
-  var contactsheet_index_facility = parseInt(indexes.getProperty('indexContactPageFacility'))
-  var contactsheet_index_state = parseInt(indexes.getProperty('indexContactPageState'))
-  var contactsheet_index_pickup = parseInt(indexes.getProperty('indexContactPagePickup'))
-  var contactsheet_index_issue = parseInt(indexes.getProperty('indexContactPageIssue'))
-  var contactsheet_index_contact = parseInt(indexes.getProperty('indexContactPageContact'))
-  var contactsheet_index_id = parseInt(indexes.getProperty('indexContactPageID'))
-  var contactsheet_index_last_donation_date = parseInt(indexes.getProperty('indexContactPageLastDate'))
-  var contactsheet_index_supplies_notes = parseInt(indexes.getProperty('indexContactPageSuppliesNote'))
-  var contactsheet_index_salesforce_contacts = parseInt(indexes.getProperty('indexContactPageSalesforceContact'))
-  var contactsheet_index_import_format = parseInt(indexes.getProperty('indexContactPageImportFormat'))
-  var contactsheet_index_all_emails = parseInt(indexes.getProperty('indexContactPageFacilityEmails'))
+  var contactsheet_index_faxnumber = indexes.indexFaxnumber
+  var contactsheet_index_facility = indexes.indexFacility
+  var contactsheet_index_state = indexes.indexState
+  var contactsheet_index_pickup = indexes.indexPickup
+  var contactsheet_index_issue = indexes.indexIssue
+  var contactsheet_index_contact = indexes.indexContact
+  var contactsheet_index_id = indexes.indexId
+  var contactsheet_index_last_donation_date = indexes.indexLastDonationDate
+  var contactsheet_index_supplies_notes = indexes.indexSuppliesNotes
+  var contactsheet_index_salesforce_contacts = indexes.indexSalesforceContacts
+  var contactsheet_index_import_format = indexes.indexImportFormat
+  var contactsheet_index_all_emails = indexes.indexAllEmails
 
   
   for(var i = 0; i < data.length; i++){
@@ -539,12 +539,12 @@ function new_addDonationRow(key_vals, main_sheet, contact_sheet){
   }
   var date = Utilities.formatDate(new Date(), "GMT-07:00", "MM/dd/yyyy ")    
 
-  var indexes = PropertiesService.getScriptProperties()
-  var indexState = parseInt(indexes.getProperty('indexMainPageState'))
-  var indexIssues = parseInt(indexes.getProperty('indexMainPageHistoriceIssues'))
-  var indexSuppliesNotes = parseInt(indexes.getProperty('indexMainPageSuppliesNotes'))
-  var indexPickup = parseInt(indexes.getProperty('indexMainPageLocation'))
-  var indexInSirum = parseInt(indexes.getProperty('indexMainPageInSirum'))
+  var indexes = getMainPageIndexes()
+  var indexState = indexes.indexState
+  var indexIssues = indexes.indexIssues
+  var indexSuppliesNotes = indexes.indexSuppliesNotes
+  var indexPickup = indexes.index_pickup
+  var indexInSirum = indexes.indexInSirum
 
   var contact_info = nameContactLookup(main_sheet.getRange("C"+row_num).getValue(), contact_sheet) //returns [state,issue,pickup_loc,supp_notes, v1_import_format]
 
@@ -580,20 +580,20 @@ function addDonationRow(subject, fax_number, facility, contact_sheet, main_page,
   var colorado_forward_req = "" //will put a FORWARD in the CO Fax cell so that someone can make a note of whether they forwarded the CO Fax
   var issueAutoPop = ""
 
-  var indexes = PropertiesService.getScriptProperties()  
+  var indexes = getContactPageIndexes()  
 
-  var contactsheet_index_faxnumber = parseInt(indexes.getProperty('indexContactPageFaxNumber'))
-  var contactsheet_index_facility = parseInt(indexes.getProperty('indexContactPageFacility'))
-  var contactsheet_index_state = parseInt(indexes.getProperty('indexContactPageState'))
-  var contactsheet_index_pickup = parseInt(indexes.getProperty('indexContactPagePickup'))
-  var contactsheet_index_issue = parseInt(indexes.getProperty('indexContactPageIssue'))
-  var contactsheet_index_contact = parseInt(indexes.getProperty('indexContactPageContact'))
-  var contactsheet_index_id = parseInt(indexes.getProperty('indexContactPageID'))
-  var contactsheet_index_last_donation_date = parseInt(indexes.getProperty('indexContactPageLastDate'))
-  var contactsheet_index_supplies_notes = parseInt(indexes.getProperty('indexContactPageSuppliesNote'))
-  var contactsheet_index_salesforce_contacts = parseInt(indexes.getProperty('indexContactPageSalesforceContact'))
-  var contactsheet_index_import_format = parseInt(indexes.getProperty('indexContactPageImportFormat'))
-  var contactsheet_index_all_emails = parseInt(indexes.getProperty('indexContactPageFacilityEmails'))
+  var contactsheet_index_faxnumber = indexes.indexFaxnumber
+  var contactsheet_index_facility = indexes.indexFacility
+  var contactsheet_index_state = indexes.indexState
+  var contactsheet_index_pickup = indexes.indexPickup
+  var contactsheet_index_issue = indexes.indexIssue
+  var contactsheet_index_contact = indexes.indexContact
+  var contactsheet_index_id = indexes.indexId
+  var contactsheet_index_last_donation_date = indexes.indexLastDonationDate
+  var contactsheet_index_supplies_notes = indexes.indexSuppliesNotes
+  var contactsheet_index_salesforce_contacts = indexes.indexSalesforceContacts
+  var contactsheet_index_import_format = indexes.indexImportFormat
+  var contactsheet_index_all_emails = indexes.indexAllEmails
 
   
   

@@ -4,16 +4,16 @@ function runDataSync(){
   var data_val_page = sh.getSheetByName("Data Validation")
   var main_data = main_page.getDataRange().getValues()
   
-  var indexes = PropertiesService.getScriptProperties()  
-  var indexInSirum = parseInt(indexes.getProperty('indexMainPageInSirum')) //this is where we have the way we get data to V1 for each row
+  var indexes = getMainPageIndexes()
+  var indexInSirum = indexes.indexInSirum //this is where we have the way we get data to V1 for each row
 
   
   var coleman_to_do_sheet = SpreadsheetApp.openById("1HglNrncAbiJgqOzned29dfQiEo9YUBFC1cXJ1fF_nEA").getSheetByName("To Do List")
   var existing_coleman_trackings = getExistingColemanTrackings(coleman_to_do_sheet)
   var batch_to_do_sheet = SpreadsheetApp.openById("1EMOdZDGBIwTVkIsrkODB3tBzBpkS6-u432GrsOY84d4").getSheetByName("V2 UI")
 
-  var indexState = parseInt(indexes.getProperty('indexMainPageState'))
-  var indexFacility = parseInt(indexes.getProperty('indexMainPageFacilityName'))
+  var indexState = indexes.indexState
+  var indexFacility = indexes.indexFacilityName
   
   var coleman_exclude_states = getColemanExclude(data_val_page);
   var coleman_exclude_accounts = getPharmacyNames(data_val_page)
@@ -55,14 +55,14 @@ function runDataSync(){
 function addToBatchGenerator(data_row,batch_to_do_sheet,row_index, main_sheet,indexes, V2PullFacilities){
   
 
-  var indexActualIssues = parseInt(indexes.getProperty('indexMainPageIssues'))
-  var indexInSirum = parseInt(indexes.getProperty('indexMainPageInSirum'))
-  var indexResolved = parseInt(indexes.getProperty('indexMainPageResolved'))
-  var indexColoradElig = parseInt(indexes.getProperty('indexMainPageCOFWD'))
-  var indexState = parseInt(indexes.getProperty('indexMainPageState'))
-  var indexFacility = parseInt(indexes.getProperty('indexMainPageFacilityName'))
-  var index_tracking_number = parseInt(indexes.getProperty('indexMainPageAutoTrackingNum'))
-  var index_received = parseInt(indexes.getProperty('indexMainPageReceivedEmail'))
+  var indexActualIssues = indexes.indexActualIssues
+  var indexInSirum = indexes.indexInSirum
+  var indexResolved = indexes.indexHumanIssues
+  var indexColoradElig = indexes.indexCOFwd
+  var indexState = indexes.indexState
+  var indexFacility = indexes.indexFacilityName
+  var index_tracking_number = indexes.indexTrackingNum
+  var index_received = indexes.indexReceivedEmail
   var date_string = Utilities.formatDate(new Date(), "GMT-07:00", "MM/dd/yyyy")
   
   if((data_row[index_tracking_number].toString().trim().length > 0) //there is a tracking number because it shipped (wait for at least this)
@@ -89,13 +89,13 @@ function addToBatchGenerator(data_row,batch_to_do_sheet,row_index, main_sheet,in
 function new_addToColemanSheet(data_row, coleman_to_do_sheet,row_index, main_sheet, existing_tracking_nums, indexes){
 
 
-  var indexActualIssues = parseInt(indexes.getProperty('indexMainPageIssues'))
-  var indexInSirum = parseInt(indexes.getProperty('indexMainPageInSirum'))
-  var indexColemanTracking = parseInt(indexes.getProperty('indexMainPageManualTrackingNum'))
-  var indexResolved = parseInt(indexes.getProperty('indexMainPageResolved'))
-  var indexColoradElig = parseInt(indexes.getProperty('indexMainPageCOFWD'))
-  var indexState = parseInt(indexes.getProperty('indexMainPageState'))
-  var indexFacility = parseInt(indexes.getProperty('indexMainPageFacilityName'))
+  var indexActualIssues = indexes.indexActualIssues
+  var indexInSirum = indexes.indexInSirum
+  var indexColemanTracking = indexes.indexColemanTracking
+  var indexResolved = indexes.indexHumanIssues
+  var indexColoradElig = indexes.indexCOFwd
+  var indexState = indexes.indexState
+  var indexFacility = indexes.indexFacilityName
   var colorado_tag = "Log NDC: CO eligible donation"
   
   var date_string = Utilities.formatDate(new Date(), "GMT-07:00", "MM/dd/yyyy")
@@ -189,13 +189,13 @@ function getExistingColemanTrackings(coleman_todo_sheet){
 function addToColemanSheet(data_row, coleman_to_do_sheet, coleman_exclude_arr,row_index, main_sheet, existing_tracking_nums, indexes, coleman_exclude_accounts){
 
 
-  var indexActualIssues = parseInt(indexes.getProperty('indexMainPageIssues'))
-  var indexInSirum = parseInt(indexes.getProperty('indexMainPageInSirum'))
-  var indexColemanTracking = parseInt(indexes.getProperty('indexMainPageManualTrackingNum'))
-  var indexResolved = parseInt(indexes.getProperty('indexMainPageResolved'))
-  var indexColoradElig = parseInt(indexes.getProperty('indexMainPageCOFWD'))
-  var indexState = parseInt(indexes.getProperty('indexMainPageState'))
-  var indexFacility = parseInt(indexes.getProperty('indexMainPageFacilityName'))
+  var indexActualIssues = indexes.indexActualIssues
+  var indexInSirum = indexes.indexInSirum
+  var indexColemanTracking = indexes.indexColemanTracking
+  var indexResolved = indexes.indexHumanIssues
+  var indexColoradElig = indexes.indexCOFwd
+  var indexState = indexes.indexState
+  var indexFacility = indexes.indexFacilityName
   
   
   var date_string = Utilities.formatDate(new Date(), "GMT-07:00", "MM/dd/yyyy")
