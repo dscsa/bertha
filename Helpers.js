@@ -1,23 +1,5 @@
 //----------------------------------HELPER FUNCTIONS----------------------------------------------------------------------------------------------
 
-
-
-
-//TODO: add indexes to property and build this out
-function getPickupSheetIndexes(){
-  var indexes = PropertiesService.getScriptProperties()  
-
-  var res_obj = {
-    //TODO here
-  }
-  
-  return res_obj
-
-}
-
-
-
-//getColemanExclude
 //Looks at the Data Validation sheet column J to see all the state fields to ignore
 //when pending the coleman to-dos
 function getPharmacyNames(data_val_sheet){
@@ -42,7 +24,7 @@ function getPharmacyNames(data_val_sheet){
 
 //Given a template with variables formatted $(variable name)
 //returns all the variable names, useful for gneerating email drafts
-function extractVariables(template){
+function extract_variables(template){
   var rx = /\$\(([a-zA-Z\s]*)\)/gm
   var res = []
   var last_match = rx.exec(template)
@@ -56,13 +38,13 @@ function extractVariables(template){
 }
 
 
-//sendAlertEmail(error_code, phone_number, facility, message_to_fill, error_array)
+//send_alert_email(error_code, phone_number, facility, message_to_fill, error_array)
 //Handles sending an email out from this address to the relavant parties with relavant message. Can take message_to_fill from the 
 //action required column of the contacts, or the phone_number of an unknown fax. Different error_codes create different kinds of emails
 //and require different data. Considered a helper since both Auto-Log and the daily sweep use it, only the latter needs an error array
 //-------------------------------------
 
-function sendAlertEmail(error_code, phone_number, facility, message_to_fill, error_array){ //needs number for unknown cases, facility & message for action items, and could use
+function send_alert_email(error_code, phone_number, facility, message_to_fill, error_array){ //needs number for unknown cases, facility & message for action items, and could use
    //error codes in the future to determine severity of action, and who the email should go to
   var subject = "Auto-Logger Message"
   var message = "Hi y'all!\n\n" //for character ;)
@@ -135,7 +117,7 @@ function duplicateRowBelow(page,n){
      page.insertRowAfter(n+1)
      var data = page.getDataRange().getValues();
 
-     var indexes = getMainPageIndexes()
+     var indexes = get_main_indexes()
      var index_action = indexes.indexPend
      var index_logger = indexes.indexLogger
      var index_facility_name = indexes.indexFacilityName

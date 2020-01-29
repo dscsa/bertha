@@ -1,7 +1,7 @@
 //when the archiving functionality labeled a bunch of rows even though they were incomplete on 4/21/20
-function debugOverEagerArchive() {
+function debug_overeager_archive() {
   
-  var indexes = getMainPageIndexes()
+  var indexes = get_main_indexes()
 
   var sh = SpreadsheetApp.getActiveSpreadsheet()
   var archive = sh.getSheetByName("Main Page Archive")
@@ -13,7 +13,7 @@ function debugOverEagerArchive() {
       Logger.log(data[i][data[i].length-1].toString())
       archive.getRange((i+1),1,1,archive.getMaxColumns()).setBackground("red")
       //main_page.appendRow(data[i])
-      //autoGroup(data[i][2].toString().trim())
+      //auto_group(data[i][2].toString().trim())
     }
   }
   

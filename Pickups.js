@@ -13,7 +13,7 @@
 //later the setPickups function will be triggered to set pickups at all the facilities on that sheet.
 //The latter could be done by email until it's set to autotrigger
 //-----------------------------------------
-function pendPickups(start){
+function pend_pickups(start){
   start = start || 0
   var ss = SpreadsheetApp.openById(BERTHA_ID);
   var main_sheet = ss.getSheetByName("1 - Main Page")
@@ -21,8 +21,8 @@ function pendPickups(start){
   var pending_sheet = ss.getSheetByName("3 - Pickups");
   var data_val_sheet = ss.getSheetByName("Data Validation");
   var coleman_to_do_sheet = SpreadsheetApp.openById("1HglNrncAbiJgqOzned29dfQiEo9YUBFC1cXJ1fF_nEA").getSheetByName("To Do List")
-  var coleman_exclude_arr = getColemanExclude(data_val_sheet);
-  var existing_coleman_trackings = getExistingColemanTrackings(coleman_to_do_sheet)
+  var coleman_exclude_arr = get_coleman_exclude(data_val_sheet);
+  var existing_coleman_trackings = get_existing_coleman_trackings(coleman_to_do_sheet)
   var coleman_exclude_accounts = getPharmacyNames(data_val_sheet)
   var pended_facilities = [] //create an array of unique entries per facility that needs pickup
   var facilities_to_pend = {}
@@ -40,7 +40,7 @@ function pendPickups(start){
   var contact_data = contact_sheet.getDataRange().getValues()
 
   //get pickup and issue from the main sheet, not contacts. Only get id from contacts.   
-  var main_indexes = getMainPageIndexes()  
+  var main_indexes = get_main_indexes()  
   
   var indexFacility = indexes.indexFacilityName
   var indexPickup = indexes.index_pickup
@@ -51,7 +51,7 @@ function pendPickups(start){
   var indexInSirum = indexes.indexInSirum
 
   
-  var contact_indexes = getContactPageIndexes()
+  var contact_indexes = get_contact_indexes()
   
   var contactsheet_index_faxnumber = contact_indexes.indexFaxnumber
   var contactsheet_index_facility = contact_indexes.indexFacility
@@ -73,7 +73,7 @@ function pendPickups(start){
     //if((facility != "Not Found") && (main_data[n][indexInSirum].toString().toLowerCase().indexOf("coleman sheet") == -1)){
       //THIS IS WHERE YOU CALL ADD TO COLEMAN SHEET
       //structured this way to keep updating the existing_coleman_trakcings after each row if necesary
-      //existing_coleman_trackings = addToColemanSheet(main_data[n], coleman_to_do_sheet,coleman_exclude_arr,n, main_sheet, existing_coleman_trackings, indexes, coleman_exclude_accounts);
+      //existing_coleman_trackings = add_to_coleman_sheet(main_data[n], coleman_to_do_sheet,coleman_exclude_arr,n, main_sheet, existing_coleman_trackings, indexes, coleman_exclude_accounts);
     //}
 
     
@@ -140,7 +140,7 @@ function pendPickups(start){
     source_range.copyTo(pending_sheet.getRange("L" + (pending_sheet.getLastRow()) + ":M" + (pending_sheet.getLastRow())))
     
   }
-  if(pended_facilities.length >= 1) sendAlertEmail(6, "", "", "", pended_facilities) 
+  if(pended_facilities.length >= 1) send_alert_email(6, "", "", "", pended_facilities) 
 }
 
 
@@ -151,7 +151,7 @@ function pendPickups(start){
 //But this can be triggered as a standalone within the script
 //OR by clicking the button on the Pickups page. 
 //-----------------------------
-function manualSetPickups(start){
+function set_pickups(start){
   start = start || 0
   var ss = SpreadsheetApp.openById(BERTHA_ID);
   var main_sheet = ss.getSheetByName("1 - Main Page");
@@ -231,7 +231,7 @@ function manualSetPickups(start){
           pending_sheet.getRange(pickup_date_cell).setValue(pickup_date)
           data[n][4] = Utilities.formatDate(CurrentDate, "GMT-07:00", "MM/dd/yyyy ")
           data[n][5] = pickup_date
-          generateOutboundEmails("zero",ss, data[n])
+          generate_outbound_emails("zero",ss, data[n])
         }
      
       }

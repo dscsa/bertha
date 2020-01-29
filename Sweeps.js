@@ -8,7 +8,7 @@
 // 2) If there is a donation that has been picked up but not delivered after X days
 //Has its own boiler plate and utilizes some helper functions, but not triggered by the Auto-Log functionality
 
-function issueSweep(start){
+function issue_sweep(start){
  
   //Boiler plate, same as Auto-Log, to get its bearings
   start = start || 0;
@@ -18,17 +18,17 @@ function issueSweep(start){
   var pending_page = ss.getSheetByName("3 - Pickups")
   var data_val_page = ss.getSheetByName("Data Validation")
   
-  var attention_items = []; //will be filled with any issues, and then passed to sendAlertEmail so they can be listed and sent
+  var attention_items = []; //will be filled with any issues, and then passed to send_alert_email so they can be listed and sent
   var day = 1000*60*60*24 //since date arithmetic gives answers in milliseconds, declare this variable now
-  custom_lock("issueSweep")
+  custom_lock("issue_sweep")
 
 
   var days_to_wait_for_pickup = 1  //could, down the road, pull from an extra variable sheet, so nobody needs to edit the script
   var days_to_wait_for_arrival = 7
     
   
-  var main_indexes = getMainPageIndexes()
-  var contact_indexes = getContactPageIndexes()
+  var main_indexes = get_main_indexes()
+  var contact_indexes = get_contact_indexes()
   
   var index_facility = main_indexes.indexFacilityName
   var index_action = main_indexes.indexPend
@@ -59,7 +59,7 @@ function issueSweep(start){
 
   
   var pharmacy_list = getPharmacyNames(data_val_page)
-  var exclude_list = getColemanExclude(data_val_page)
+  var exclude_list = get_coleman_exclude(data_val_page)
 
   main_page.getRange(1,(index_shipped+1),main_page.getMaxRows(),2).setNumberFormat("@STRING@")//set shipped & received columns to be pure strings so the dates are more easy to handle
 
@@ -207,10 +207,10 @@ function issueSweep(start){
   }
   
   if(attention_items.length > 0){ //sends an email of issues if there are any (essentially what Allison does right now)
-    sendAlertEmail(4,"","","",attention_items)
+    send_alert_email(4,"","","",attention_items)
   }  
   
-  custom_unlock("issueSweep")
+  custom_unlock("issue_sweep")
 }
 
 
@@ -311,9 +311,9 @@ function reschedule(facility,date_pended, pending_page, today_date,ss){
           }
           data[i][5] = new_pend_content
           if(first_reschedule){
-            generateOutboundEmails("one",ss,data[i])
+            generate_outbound_emails("one",ss,data[i])
           } else if(second_reschedule){
-            generateOutboundEmails("two",ss,data[i])
+            generate_outbound_emails("two",ss,data[i])
           }
           var confirmation_cell = "H" + (i+1)
           var confirmation_number = res.substring(res.indexOf("CPU"),res.indexOf("CPU")+13)
@@ -338,7 +338,8 @@ function reschedule(facility,date_pended, pending_page, today_date,ss){
 
 //Sweep through the main sheet and look at the manual tracking column, for any unshipped boxes, and check if they're in the tracking DB
 //because they won't be tracked so might as well handle now
-function checkForDups(){
+//Currently NOT called anywhere
+function check_for_dups(){
   var ss = SpreadsheetApp.openById(BERTHA_ID)
   var backend_sh = SpreadsheetApp.openById(BACKEND_ID)
 
@@ -347,7 +348,7 @@ function checkForDups(){
   var main_sheet_data = main_sheet.getDataRange().getValues()
   var db_data = tracking_db.getDataRange().getValues()
   
-  var indexes = getMainPageIndexes()
+  var indexes = get_main_indexes()
   
   var index_facility = indexes.indexFacilityName
   var index_action = indexes.indexPend

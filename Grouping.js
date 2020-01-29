@@ -1,8 +1,8 @@
 
 //Triggered by button, useful for supply requests
-function manualGroup(){
+function manual_group(){
     
-  var indexes = getMainPageIndexes()
+  var indexes = get_main_indexes()
   
   var indexFacilityName = indexes.indexFacilityName
   var indexLogger = indexes.indexLogger
@@ -50,9 +50,9 @@ function manualGroup(){
 //called at the end of the appendRow function.
 //Given a facility name, it'll find all the rows with that name still in the main page
 //and move them down to group with the new row (they'll appear right chronologically before the new row & maintain their ordering)
-function autoGroup(name){
+function auto_group(name){
   
-  var indexes = getMainPageIndexes()
+  var indexes = get_main_indexes()
   var indexFacilityName = indexes.indexFacilityName
   var indexLogger = indexes.indexLogger
   
@@ -103,9 +103,9 @@ function autoGroup(name){
 //called at the end of the appendRow function.
 //Given a facility name, it'll find all the rows with that name still in the main page
 //and move them down to group with the new row (they'll appear right chronologically before the new row & maintain their ordering)
-function autoGroupSupplies(name){
+function auto_group_supplies(name){
   
-  var indexes = getMainPageIndexes()
+  var indexes = get_main_indexes()
   var indexFacilityName = indexes.indexFacilityName
   var indexLogger = indexes.indexLogger
   

@@ -1,24 +1,24 @@
-function runDataSync(){
+function run_data_sync(){
   var sh = SpreadsheetApp.openById(BERTHA_ID)
   var main_page = sh.getSheetByName("1 - Main Page")
   var data_val_page = sh.getSheetByName("Data Validation")
   var main_data = main_page.getDataRange().getValues()
   
-  var indexes = getMainPageIndexes()
+  var indexes = get_main_indexes()
   var indexInSirum = indexes.indexInSirum //this is where we have the way we get data to V1 for each row
 
   
   var coleman_to_do_sheet = SpreadsheetApp.openById("1HglNrncAbiJgqOzned29dfQiEo9YUBFC1cXJ1fF_nEA").getSheetByName("To Do List")
-  var existing_coleman_trackings = getExistingColemanTrackings(coleman_to_do_sheet)
+  var existing_coleman_trackings = get_existing_coleman_trackings(coleman_to_do_sheet)
   var batch_to_do_sheet = SpreadsheetApp.openById("1EMOdZDGBIwTVkIsrkODB3tBzBpkS6-u432GrsOY84d4").getSheetByName("V2 UI")
 
   var indexState = indexes.indexState
   var indexFacility = indexes.indexFacilityName
   
-  var coleman_exclude_states = getColemanExclude(data_val_page);
+  var coleman_exclude_states = get_coleman_exclude(data_val_page);
   var coleman_exclude_accounts = getPharmacyNames(data_val_page)
   
-  var V2PullFacilities = getContactsRequiringV2ToV1(sh)
+  var V2PullFacilities = get_contacts_requiring_v2_to_v1(sh)
   
   custom_lock("runDataSync")
   
@@ -27,19 +27,19 @@ function runDataSync(){
   
     if(main_data[i][indexInSirum].toString().toLowerCase().indexOf("todo coleman") > -1){
      
-      existing_coleman_trackings = new_addToColemanSheet(main_data[i], coleman_to_do_sheet,i, main_page, existing_coleman_trackings, indexes) //then move to the coleman sheet if it meets all the other criteria
+      existing_coleman_trackings = new_add_to_coleman_sheet(main_data[i], coleman_to_do_sheet,i, main_page, existing_coleman_trackings, indexes) //then move to the coleman sheet if it meets all the other criteria
       
     } else if(main_data[i][indexInSirum].toString().toLowerCase().indexOf("v2") > -1){
       //then move to V1 Upload batch generator if it meets all the criteria
     
-      addToBatchGenerator(main_data[i],batch_to_do_sheet,i, main_page,indexes, V2PullFacilities)
+      add_to_batch_generator(main_data[i],batch_to_do_sheet,i, main_page,indexes, V2PullFacilities)
     
     } else if(main_data[i][indexInSirum].toString().length == 0){
     
       //check if it should have been tagged for coleman before
       if((coleman_exclude_states.indexOf(main_data[i][indexState].toString().trim()) == -1) && (coleman_exclude_accounts.indexOf(main_data[i][indexFacility].toString().trim()) == -1)){
         //then process anyway --> it shouldve been tagged as coleman todo
-        existing_coleman_trackings = new_addToColemanSheet(main_data[i], coleman_to_do_sheet,i, main_page, existing_coleman_trackings, indexes) //then move to the coleman sheet if it meets all the other criteria
+        existing_coleman_trackings = new_add_to_coleman_sheet(main_data[i], coleman_to_do_sheet,i, main_page, existing_coleman_trackings, indexes) //then move to the coleman sheet if it meets all the other criteria
       }
 
     }
@@ -52,7 +52,7 @@ function runDataSync(){
 
 
 //TODO: change this function
-function addToBatchGenerator(data_row,batch_to_do_sheet,row_index, main_sheet,indexes, V2PullFacilities){
+function add_to_batch_generator(data_row,batch_to_do_sheet,row_index, main_sheet,indexes, V2PullFacilities){
   
 
   var indexActualIssues = indexes.indexActualIssues
@@ -86,7 +86,7 @@ function addToBatchGenerator(data_row,batch_to_do_sheet,row_index, main_sheet,in
 //Integrates with the coleman to-do sheet to auto-populate it with donations that
 //need to be logged. Does some checking on whetehr a row corresponds to a coleman donation
 //and makes a note whne complete in bertha's mainsheet
-function new_addToColemanSheet(data_row, coleman_to_do_sheet,row_index, main_sheet, existing_tracking_nums, indexes){
+function new_add_to_coleman_sheet(data_row, coleman_to_do_sheet,row_index, main_sheet, existing_tracking_nums, indexes){
 
 
   var indexActualIssues = indexes.indexActualIssues
@@ -144,10 +144,10 @@ function new_addToColemanSheet(data_row, coleman_to_do_sheet,row_index, main_she
 
 
 
-//getColemanExclude
+//get_coleman_exclude
 //Looks at the Data Validation sheet column J to see all the state fields to ignore
 //when pending the coleman to-dos
-function getColemanExclude(data_val_sheet){
+function get_coleman_exclude(data_val_sheet){
   var data = data_val_sheet.getDataRange().getValues() //.getRange("J2:J").getValues()//data_val_sheet.getDataRange().getValues();
   var first_row = data[0]
   var index_col = first_row.indexOf("DO NOT SEND TO COLEMAN - STATES")
@@ -168,7 +168,7 @@ function getColemanExclude(data_val_sheet){
 
 
 //look at the coleman todo sheet and build an array of the tracking numbers already there, to make sure we're not repeating anything
-function getExistingColemanTrackings(coleman_todo_sheet){
+function get_existing_coleman_trackings(coleman_todo_sheet){
     var raw_data = coleman_todo_sheet.getRange("H2:H").getValues()
     var data = raw_data.filter(function(el){
       return el.toString().trim().length > 0
@@ -186,7 +186,7 @@ function getExistingColemanTrackings(coleman_todo_sheet){
 //Integrates with the coleman to-do sheet to auto-populate it with donations that
 //need to be logged. Does some checking on whetehr a row corresponds to a coleman donation
 //and makes a note whne complete in bertha's mainsheet
-function addToColemanSheet(data_row, coleman_to_do_sheet, coleman_exclude_arr,row_index, main_sheet, existing_tracking_nums, indexes, coleman_exclude_accounts){
+function add_to_coleman_sheet(data_row, coleman_to_do_sheet, coleman_exclude_arr,row_index, main_sheet, existing_tracking_nums, indexes, coleman_exclude_accounts){
 
 
   var indexActualIssues = indexes.indexActualIssues
@@ -232,7 +232,7 @@ function addToColemanSheet(data_row, coleman_to_do_sheet, coleman_exclude_arr,ro
 
 
 //build a list of all facilities for which we'd need tracking #s checked
-function getContactsRequiringV2ToV1(sh){
+function get_contacts_requiring_v2_to_v1(sh){
   
   sh = SpreadsheetApp.getActiveSpreadsheet() //TODO delete after full integration
   var contact_sheet = sh.getSheetByName('2 - Contacts')
@@ -247,12 +247,12 @@ function getContactsRequiringV2ToV1(sh){
 
 
 //In case we get out of whack, and miss values, use this to do a one-time sweep of numbers
-function sweepForNumbers(){
+function sweep_for_numbers(){
   var sh = SpreadsheetApp.getActiveSpreadsheet()
   var archive = SpreadsheetApp.openById('11fpKJAaOB080HRK0WO7Ekt0l_nsNAse7eNT5xSjsCr8')
   var old_archive = SpreadsheetApp.openById('1bCU7891nSDDb9VHhotTs09vyKfUK_hsRPsJ6x6EH9IY')
   
-  var facilities = getContactsRequiringV2ToV1()
+  var facilities = get_contacts_requiring_v2_to_v1()
   
   var main_page = sh.getSheetByName('1 - Main Page')
   var main_page_archive = sh.getSheetByName('Main Page Archive')

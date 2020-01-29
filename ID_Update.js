@@ -1,4 +1,4 @@
-function updateDonorIds() {
+function update_donor_ids() {
   var ss = SpreadsheetApp.openById(BERTHA_ID)
   var pickup_sheet = ss.getSheetByName("3 - Pickups")
   var contact_sheet = ss.getSheetByName("2 - Contacts")
@@ -22,7 +22,7 @@ function updateDonorIds() {
   var contact_data = contact_sheet.getDataRange().getValues()
   var body = "I updated the donor id's for the following facility rows\n"
   
-  var indexes = getContactPageIndexes()
+  var indexes = get_contact_indexes()
     
   for(var i = 0; i < contact_data.length; i++){
     var row_fac = contact_data[i][indexes.indexFacility].toString().trim()

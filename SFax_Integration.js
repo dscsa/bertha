@@ -1,4 +1,4 @@
-function tagSFaxRows(ss,date,main_page){
+function tag_sfax_rows(ss,date,main_page){
   var backend_sh = SpreadsheetApp.openById(BACKEND_ID)
 
    //Then look at the SFax pings and process any new ones to add tracking nums to the main_page
@@ -34,7 +34,7 @@ function tagSFaxRows(ss,date,main_page){
   
   //new_todos is now an object with fax_ids as keys, and all the info we need for the fax in the object itself. 
   //go to the main_page and perform relavant tagging
-  var completed_ids = performMainPageTagging(new_todos,main_page)
+  var completed_ids = perform_main_page_tagging(new_todos,main_page)
   
   var sfax_sheet_data = sfax_sheet.getDataRange().getValues()
   for(var i = 1; i < sfax_sheet_data.length; i++){
@@ -44,10 +44,10 @@ function tagSFaxRows(ss,date,main_page){
   }
 }
 
-function performMainPageTagging(obj_to_process, main_page){
+function perform_main_page_tagging(obj_to_process, main_page){
   var completed = []
   
-  var indexes = getMainPageIndexes()
+  var indexes = get_main_indexes()
   var indexSFaxInfo = indexes.indexRawFax
   var indexManualTrackingNum = indexes.indexColemanTracking
   var indexActualIssues = indexes.indexActualIssues 
@@ -135,7 +135,7 @@ function doGet(e) { //Sfax should be sending GETs
   
   //debugEmail('GOT a request from SFAX', JSON.stringify(params))
   
-  var full_info = (typeof fax_id === 'undefined') ? 'Not a real callback' : getBarcodeInfo(fax_id,api_key,token)
+  var full_info = (typeof fax_id === 'undefined') ? 'Not a real callback' : get_barcode_info(fax_id,api_key,token)
   if(!full_info) full_info = "Failed to call SFax"
   
   //debugEmail('Full Info for Inbound Fax returned value', JSON.stringify(full_info))
@@ -163,7 +163,7 @@ function doPost(e){
   var token = params['token']
   var fax_id = params['faxid']
   
-  var full_info = (typeof fax_id === 'undefined') ? 'Not a real callback' : getBarcodeInfo(fax_id,api_key,token)
+  var full_info = (typeof fax_id === 'undefined') ? 'Not a real callback' : get_barcode_info(fax_id,api_key,token)
   if(!full_info) full_info = "Failed to call SFax"
   var backend_sh = SpreadsheetApp.openById(BACKEND_ID)
 
@@ -188,11 +188,11 @@ function doPost(e){
 
 //Given the info from an SFax ping, puts together an API request to them, and process the full info
 //for a given fax
-function getBarcodeInfo(fax_id,api_key,token){
+function get_barcode_info(fax_id,api_key,token){
   var url = "https://api.sfaxme.com/api/InboundFaxInfo?token=" + encodeURIComponent(token) + "&apikey=" + encodeURIComponent(api_key) + "&FaxId=" + encodeURIComponent(fax_id)
   try{
     var res = JSON.parse(UrlFetchApp.fetch(url).getContentText())
-    return extractFaxInfo(res)
+    return extract_fax_info(res)
   } catch(err){
     return err
   }
@@ -200,7 +200,7 @@ function getBarcodeInfo(fax_id,api_key,token){
 
 //Given the response object from SFax's InboundFaxInfo call, returns an object with relavant pieces
 //and especially tracking numbers extracted
-function extractFaxInfo(sfax_response_obj){
+function extract_fax_info(sfax_response_obj){
   //var sfax_response_obj = JSON.parse('{"inboundFaxItem":{"FaxId":"2190401201000980691","Pages":"4","ToFaxNumber":"18557916085","FromFaxNumber":"5302731333","FromCSID":"2731333","FaxDateUtc":"4/1/2019 8:10:18 PM","FaxSuccess":"1","Barcodes":{"FirstBarcodePage":1,"TotalPagesWithBarcodes":1,"PagesWithBarcodes":[1],"BarcodeItems":[{"BarcodeSpacingXAxis":0,"BarcodeSpacingYAxis":0,"BarcodeType":0,"BarcodeMode":1,"BarcodeData":"9612019971424215517488","BarcodeX":157,"BarcodeY":1773,"BarcodePage":1,"BarcodeScale":0,"BarcodeWidth":684,"BarcodeHeight":303},{"BarcodeSpacingXAxis":0,"BarcodeSpacingYAxis":0,"BarcodeType":0,"BarcodeMode":1,"BarcodeData":"[)>010295112840019971424215517488FDEB97142420501/12.0LBN725 E. Santa Clara Street, Ste 202San JoseCA 0610ZGD00811ZBetter Health Pharmacy12Z650488743423ZN22ZN20Z 028Z97142421551748831Z                                  33Z  34Z019KD261R818T33379P26Z1891","BarcodeX":116,"BarcodeY":1455,"BarcodePage":1,"BarcodeScale":0,"BarcodeWidth":556,"BarcodeHeight":245}]},"InboundFaxId":"2190401201000980691","FaxPages":"4","FaxDateIso":"2019-04-01T20:10:18Z","WatermarkId":"2190401201018997198","CreateDateIso":"2019-04-01T20:10:18.1207720Z"},"isSuccess":true,"message":null}')
 
   var res = {}
@@ -224,7 +224,7 @@ function extractFaxInfo(sfax_response_obj){
 }
 
 
-
+//Am I using this anywhere?
 function getV1Info(tracking_num) {
   var raw_info_url = TRACKING_URL
   var url = raw_info_url + tracking_num

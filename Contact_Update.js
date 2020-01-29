@@ -16,14 +16,14 @@
     //and so this should sweep through the main sheet and make sure all the fields are in sync with
     //contact sheet. This shoudl not be common. 
 //Case 3: The fax number is linked to the wrong account 
-function contactUpdate(start) {
+function contact_update(start) {
     start = start || 0;
     var ss = SpreadsheetApp.openById(BERTHA_ID);
     var main_page = ss.getSheetByName("1 - Main Page")
     var contact_sheet = ss.getSheetByName("2 - Contacts")
     
     
-    var main_indexes = getMainPageIndexes()
+    var main_indexes = get_main_indexes()
     var indexIssues = main_indexes.indexIssues
     var indexFacility = main_indexes.indexFacilityName
     var indexState = main_indexes.indexState
@@ -45,7 +45,7 @@ function contactUpdate(start) {
     var v1_format = ""
     
     var last_facility = ""
-    var contact_indexes = getContactPageIndexes()
+    var contact_indexes = get_contact_indexes()
     
     var contactsheet_index_faxnumber = contact_indexes.indexFaxnumber
     var contactsheet_index_facility = contact_indexes.indexFacility

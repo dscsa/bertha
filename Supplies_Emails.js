@@ -1,5 +1,5 @@
 //Regex to see if an email subject is an Amazon shipment
-function fromAmazon(subject){
+function from_amazon(subject){
   var rx = /Your Amazon(\S)* order ((\S)+|of (.* )*".+") has shipped/g
   var res = subject.match(rx)
   if(res){
@@ -9,7 +9,7 @@ function fromAmazon(subject){
   }
 }
 
-function queueAmazonEmails(subject,content, supplies_email_sheet){
+function queue_amazon_emails(subject,content, supplies_email_sheet){
 
   var preLinkText = "Track your package at:"
 
@@ -36,7 +36,7 @@ function queueAmazonEmails(subject,content, supplies_email_sheet){
 }
 
 
-function archiveSupplyEmails(){
+function archive_supply_emails(){
   var sh = SpreadsheetApp.openById(BERTHA_ID)
   var emails_page = sh.getSheetByName("Import from Shippo")
   var archive = SpreadsheetApp.openById(ARCHIVES_ID).getSheetByName("Supplies Email Archive")
@@ -108,7 +108,7 @@ function collateSupplyPart(page){
 }
 
 
-function generateSupplyEmailDrafts() {
+function generate_supply_email_drafts() {
   var ss = SpreadsheetApp.openById(BERTHA_ID)
   var supplies_page = ss.getSheetByName('Import from Shippo')
   
@@ -122,7 +122,7 @@ function generateSupplyEmailDrafts() {
   var draftEmailSubject = data_val_data[1][data_val_data[0].indexOf("SUPPLIES EMAIL INFO")].toString()
   var draftEmailTemplate = data_val_data[2][data_val_data[0].indexOf("SUPPLIES EMAIL INFO")].toString()
   
-  var templateIndices = extractVariables(draftEmailTemplate)
+  var templateIndices = extract_variables(draftEmailTemplate)
   
   var indexFacility = supplies_page_data[0].indexOf("To Address Company")
   var indexEmailAddr = supplies_page_data[0].indexOf("Email Addresses")
@@ -193,7 +193,7 @@ function generateSupplyEmailDrafts() {
 
 
 
-function sendSupplyEmails(){
+function send_supply_emails(){
   var ss = SpreadsheetApp.openById(BERTHA_ID)
   var supplies_page = ss.getSheetByName('Import from Shippo')
   var supplies_page_data = supplies_page.getDataRange().getValues()

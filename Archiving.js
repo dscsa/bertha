@@ -1,7 +1,7 @@
 //function responsible for tagging rows to be archived (tags all facilities)
-function tagForArchival(){
+function tag_for_archival(){
   
-  var indexes = getMainPageIndexes()
+  var indexes = get_main_indexes()
   
   var sh = SpreadsheetApp.openById(BERTHA_ID)
   var main_page = sh.getSheetByName("1 - Main Page")
@@ -9,7 +9,7 @@ function tagForArchival(){
   var today = Utilities.formatDate(new Date(), "GMT-07:00", "MM/dd/yyyy HH:mm:ss")
   var data_val_page = sh.getSheetByName("Data Validation")
   
-  custom_lock("tagForArchival")
+  custom_lock("tag_for_archival")
   
   for(var i = 1; i < main_page_data.length; i++){  //go through all the main sheet rows
     if(main_page_data[i][indexes.indexArchived].toString().trim().indexOf(";ROW TO BE ARCHIVED") == -1){ //don't do anything to a row thats already tagged
@@ -25,7 +25,7 @@ function tagForArchival(){
     }
   }
   
-  custom_unlock("tagForArchival")
+  custom_unlock("tag_for_archival")
 }
 
 
@@ -67,7 +67,7 @@ function meetsArchiveCriteria(row, indexes){
 
 //handles actually copying & deleting rows that have been tagged
 function archive(){
-  var indexes = getMainPageIndexes()
+  var indexes = get_main_indexes()
 
   var sh = SpreadsheetApp.openById(BERTHA_ID)
   var main_page = sh.getSheetByName("1 - Main Page")
@@ -96,12 +96,12 @@ function archive(){
 
 
 //TODO: Use this sme pproach to auto-archive the Pickups sheet for rows > 2 months old
-function archiveTheArchive(){
+function archive_the_archive(){
   var archive = SpreadsheetApp.openById(BERTHA_ID).getSheetByName("Main Page Archive")
   var final_archive = SpreadsheetApp.openById(ARCHIVES_ID).getSheetByName("Main Page Final Archive")
   
   //go through archive and find lowest row with a date earlier than 2 months ago
-  var indexes = getMainPageIndexes()
+  var indexes = get_main_indexes()
   var indexPend = indexes.indexPend
   var last_row_to_index = -1;
   
@@ -134,7 +134,7 @@ function archiveTheArchive(){
 
 
 
-function archiveSFaxIntegration(){
+function archive_sfax_integration(){
   var backend_sh = SpreadsheetApp.openById(BACKEND_ID)
   var sfax_sheet = backend_sh.getSheetByName("SFax Integration")
   var archive = backend_sh.getSheetByName("SFax Integration Archive")
@@ -157,7 +157,7 @@ function archiveSFaxIntegration(){
 
 //archive the supplies page if there's an intials and date completed >2 days ago
 //triggered to run daily
-function archiveSupplies(){
+function archive_supplies(){
   var sh = SpreadsheetApp.openById(BERTHA_ID)
   var supplies_page = sh.getSheetByName("Supplies Page")
   supplies_page.getRange("A:M").setNumberFormat("@STRING@")
@@ -187,8 +187,8 @@ function archiveSupplies(){
 
 
 //MANUALLY TRIGGERED
-function storeSupplies(){
-  var indexes = getMainPageIndexes()  
+function store_supplies(){
+  var indexes = get_main_indexes()  
   
   var indexArchived = indexes.indexArchived
   var indexPend = indexes.indexPend
@@ -236,7 +236,7 @@ function storeSupplies(){
              }
              
            }
-           autoGroupSupplies(row[indexFacilityName])
+           auto_group_supplies(row[indexFacilityName])
      }
   }
 }

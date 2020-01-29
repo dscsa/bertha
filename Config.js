@@ -1,9 +1,23 @@
 var LIVE = true
 var LABEL_NAME = "Bertha"
 
+
 function testIndexes(){
-  Logger.log(getMainPageIndexes())
-  Logger.log(getContactPageIndexes())
+  Logger.log(get_main_indexes())
+  Logger.log(get_contact_indexes())
+
+}
+
+
+//TODO: add indexes to property and build this out
+function get_pickup_sheet_indexes(){
+  var indexes = PropertiesService.getScriptProperties()  
+
+  var res_obj = {
+    //TODO here
+  }
+  
+  return res_obj
 
 }
 
@@ -15,7 +29,7 @@ function testIndexes(){
 
 //TODO: turn these into global variables e.g. MAIN_INDEX_ARCHIVED
 //and store the numbers right here, instead of using the scriptProperties 
-function getMainPageIndexes(){
+function get_main_indexes(){
   var indexes = PropertiesService.getScriptProperties()  
 
   var res_obj = {
@@ -51,7 +65,7 @@ function getMainPageIndexes(){
 }
 
 //Same as contact page
-function getContactPageIndexes(){
+function get_contact_indexes(){
   var indexes = PropertiesService.getScriptProperties()  
 
   var res_obj = {

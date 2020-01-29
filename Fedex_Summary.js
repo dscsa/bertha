@@ -1,12 +1,12 @@
-function checkFedexSummary(content, main_page,ss) {
+function check_fedex_summary(content, main_page,ss) {
 
-  var tracking_nums = extractTrackingNums(content) //get all the tracking numbers out of the email body
+  var tracking_nums = extract_tracking_nums(content) //get all the tracking numbers out of the email body
 
   
   //go to the main page, and confirm that they're all their
   var page_data = main_page.getDataRange().getValues()
   
-  var indexes = getMainPageIndexes()
+  var indexes = get_main_indexes()
   var index_tracking_number = indexes.indexTrackingNum
   
   for(var i = 0; i < page_data.length; i++){
@@ -32,7 +32,7 @@ function checkFedexSummary(content, main_page,ss) {
   }
 }
 
-function extractTrackingNums(content){
+function extract_tracking_nums(content){
   var split_content = content.split("\n971")
   var res = []
 

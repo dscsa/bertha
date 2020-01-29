@@ -23,7 +23,7 @@ function custom_lock(func_name){
 
 //use this to 'unlock' by removing the cache lock
 function custom_unlock(func_name){
-  //func_name = 'Auto_Log' //if you need to manually unlock, add the function name here
+  //func_name = 'auto_log' //if you need to manually unlock, add the function name here
   console.log("trying to unlock for:" + func_name)
   
   var cache = CacheService.getDocumentCache();
@@ -33,7 +33,7 @@ function custom_unlock(func_name){
 
 
 
-function isLocked(){
+function is_locked(){
   Logger.log(CacheService.getDocumentCache().get("lock") ? "YES" : "NO")
   Logger.log(CacheService.getDocumentCache().get("function_name"))
 

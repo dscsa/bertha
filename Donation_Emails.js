@@ -1,4 +1,4 @@
-function manuallyGenerateEmails(){
+function manually_generate_emails(){
   var ss = SpreadsheetApp.openById(BERTHA_ID)
   var highlighted_range_val = SpreadsheetApp.getActiveRange().setNumberFormat("@STRING@").getValues()[0] //this has to be a range of the pickups sheet, but it might not be, so act accordingly
   
@@ -20,12 +20,12 @@ function manuallyGenerateEmails(){
     }
   }
   
-  generateOutboundEmails(code,ss,highlighted_range_val)
+  generate_outbound_emails(code,ss,highlighted_range_val)
 }
 
 
 
-function sendEmailsFromMainSheet(){
+function send_emails_from_main_page(){
   var data_val_data = SpreadsheetApp.openById(BERTHA_ID).getSheetByName("Data Validation").getDataRange().getValues()
   var index_col = data_val_data[0].indexOf("SALESFORCE BCC ADDRESS")
   var bcc_email = data_val_data[1][index_col].toString() + "," + TEAM_EMAIL //bcc to salesforce and team email
@@ -35,7 +35,7 @@ function sendEmailsFromMainSheet(){
   
   var today = Utilities.formatDate(new Date(), "GMT-07:00", "MM/dd/yyyy hh:mm:ss").toString()
 
-  var indexes = getMainPageIndexes()
+  var indexes = get_main_indexes()
   //TODO: don't need these variables to be declared, just access indexes directly
   var indexPend = indexes.indexPend
   var indexFacilityName = indexes.indexFacilityName
@@ -110,7 +110,7 @@ function sendEmailsFromMainSheet(){
 
 
 //row data is from the pending sheet, so use those indexes 
-function generateOutboundEmails(code, ss, row_data){
+function generate_outbound_emails(code, ss, row_data){
 
   //gather the row's essentials
   var facility = row_data[0].toString().trim()
@@ -136,18 +136,18 @@ function generateOutboundEmails(code, ss, row_data){
   }
   var fax_email_addr = row_data[10].toString().trim()
   var donation_leads_names_raw = row_data[12].toString().trim()
-  createDraftEmails(ss,code, facility,location,original_contact,pickup_date,pend_date,donation_leads_names_raw,all_emails, fax_email_addr)
+  create_draft_emails(ss,code, facility,location,original_contact,pickup_date,pend_date,donation_leads_names_raw,all_emails, fax_email_addr)
 
 }
 
-function createDraftEmails(ss,code, facility,location,original_contact,pickup_date,pend_date,donation_leads_names_raw,all_emails, fax_email_addr){
+function create_draft_emails(ss,code, facility,location,original_contact,pickup_date,pend_date,donation_leads_names_raw,all_emails, fax_email_addr){
   var main_page = ss.getSheetByName("1 - Main Page")
   var draft = ""
   var subject = ""
   var fax_addon = ""
   var emails_to_use = ""
   
-  var indexes = getMainPageIndexes()
+  var indexes = get_main_indexes()
   //TODO: don't need these variables to be declared, just access indexes directly
   var indexPend = indexes.indexPend
   var indexFacilityName = indexes.indexFacilityName
@@ -259,11 +259,11 @@ function similarity(s1, s2) {
   if (longerLength == 0) {
     return 1.0;
   }
-  return (longerLength - editDistance(longer, shorter)) / parseFloat(longerLength);
+  return (longerLength - edit_distance(longer, shorter)) / parseFloat(longerLength);
 }
 
 
-function editDistance(s1, s2) {
+function edit_distance(s1, s2) {
   s1 = s1.toLowerCase();
   s2 = s2.toLowerCase();
 

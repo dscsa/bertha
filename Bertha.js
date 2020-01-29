@@ -2,7 +2,7 @@
 //See documentation at the README https://docs.google.com/document/d/1rEQmdKTt_K1MXfLvZx3-IiK9pe8EfsYZkDreYQWRBn4/edit
 //Goal is to totally automate and manage the drug donation process for SIRUM
 
-function Auto_Log(start) { //Handles the GMail boilerplate and delagates necessary tasks
+function auto_log(start) { //Handles the GMail boilerplate and delagates necessary tasks
  
 //--------------------------Beginning of boiler plate------------------------------------------------------------
   start = start || 0;
@@ -15,7 +15,7 @@ function Auto_Log(start) { //Handles the GMail boilerplate and delagates necessa
   
   if(locked) return;
   
-  custom_lock("Auto_Log") //this shouldn't wait because we just checked
+  custom_lock("auto_log") //this shouldn't wait because we just checked
   
   var main_page = ss.getSheetByName("1 - Main Page");
   var contact_sheet = ss.getSheetByName("2 - Contacts");
@@ -39,44 +39,44 @@ function Auto_Log(start) { //Handles the GMail boilerplate and delagates necessa
       if (content) {
         if(subject.indexOf("Summary of failures for Google Apps Script: Bertha") > -1){ //check if its a crash email
           console.log("Dealing with crcash")
-          if(j == messages.length - 1) dealWithCrash(content)
+          if(j == messages.length - 1) deal_with_crash(content)
           //j = messages.length; //since with sfax it will do duplicates because of forwarding to info, and all that, here you can short circuit the for-loop
 
         } else if(subject.indexOf("Sfax received") > -1){ //check if its an SFax email
           console.log("Sfax")
-          if(j == messages.length - 1) dealWithSFax(subject, contact_sheet, main_page, content) //only look at most recent, so this should control for getting a new fax_id everytime
+          if(j == messages.length - 1) deal_with_sfax(subject, contact_sheet, main_page, content) //only look at most recent, so this should control for getting a new fax_id everytime
           //j = messages.length; //since with sfax it will do duplicates because of forwarding to info, and all that, here you can short circuit the for-loop
       
         } else if((subject.indexOf("Donation Shipped") > -1) && (message.getFrom().indexOf("donations@sirum.org") > -1)){  //Then its reading a Donation Shipped email, and will update the row for that facility with the tracking number
           console.log("Shipped email")
-          dealWithShipped(content, main_page,pickup_sheet, contact_sheet,data_val_sheet, tracking_db_sheet);                
+          deal_with_shipped(content, main_page,pickup_sheet, contact_sheet,data_val_sheet, tracking_db_sheet);                
       
         } else if(subject.indexOf("Donation Received") > -1){ //Then it's reading a Donation Received email, and will update the row for that donation
           console.log("Received email")
-          dealWithReceived(content, main_page);
+          deal_with_received(content, main_page);
           
         } else if (~ subject.indexOf('Tracking: Tendered to FedEx Summary Outbound')){
-          checkFedexSummary(content, main_page,ss)
+          check_fedex_summary(content, main_page,ss)
           
         } else if(subject.indexOf("#Bertha") > -1){ //based off #Bertha in the subject, and tge ints col1: cxxxx | col2: fnnnn | col3: gbbb | col5:bg
           console.log("Berth Email API")
-          logEmailAPI(subject, contact_sheet, main_page)
+          log_email_api(subject, contact_sheet, main_page)
           j = messages.length;
           
         } else if(subject.indexOf("Pickup Missed") > -1){
           console.log("Dealing with missed pickup email")
-          dealWithMissedPickups(content, main_page)
+          deal_with_missed_pickups(content, main_page)
           j = messages.length;
 
-        } else if(fromAmazon(subject)){
-          queueAmazonEmails(subject,content, supplies_email_sheet)
+        } else if(from_amazon(subject)){
+          queue_amazon_emails(subject,content, supplies_email_sheet)
           
         } else if(subject.indexOf("Auto-Log API: ") > -1){ //Then it's an API request. Could be to log a donation by email (e.g. for Pharmerica), cancel a pickup
           if(subject.indexOf("Log Donation") > -1){
-             logDonationByEmail(content, contact_sheet, main_page)
+             log_donation_by_email(content, contact_sheet, main_page)
           //Have not yet used either of these   
           } else if(subject.indexOf("Cancel Pickup") > -1){
-            cancelPickup(content, main_page)
+            cancel_pickup(content, main_page)
           } else if (subject.indexOf("Set Pickups") > -1){
           }
         }
@@ -85,15 +85,15 @@ function Auto_Log(start) { //Handles the GMail boilerplate and delagates necessa
     label.removeFromThread(threads[i]) //removes the label on the thread, and at this point all the messages within it have been processed
   }
   
-  tagSFaxRows(ss,date,main_page)
+  tag_sfax_rows(ss,date,main_page)
 
-  custom_unlock("Auto_Log")
+  custom_unlock("auto_log")
 }
 
 
 
 //if there's a crash, make sure to release the lock so that we don't destroy all the workflow
-function dealWithCrash(content){
+function deal_with_crash(content){
   var cache = CacheService.getDocumentCache()
   var text_to_search = "StartFunctionError MessageTriggerEnd" //the header of the table in the email that stores the function name
   var index_start_of_chart = content.indexOf(text_to_search) + text_to_search.length
@@ -115,12 +115,12 @@ function dealWithCrash(content){
 
 //Made to catch the cases (so far just one), where v1 was tracking and rescheduling something too many times and because the 
 //item wasn't in bertha, it just kept rescheduling for years. oof.
-function dealWithMissedPickups(content, main_page){
+function deal_with_missed_pickups(content, main_page){
   var tracking_num = content.substring(content.indexOf("tracking number")+16, content.indexOf("tracking number") + 31)
   var current_sheet_data = main_page.getDataRange().getValues();
   var facility = content.substring(content.indexOf("from ")+5,content.indexOf(" was not picked up")).replace(/(\r\n|\n|\r)/gm," ").trim()
   
-  var indexes = getMainPageIndexes()  
+  var indexes = get_main_indexes()  
   var index_tracking_number = indexes.indexTrackingNum
   var index_facility = indexes.indexFacilityName
   var found = false
@@ -146,7 +146,7 @@ function dealWithMissedPickups(content, main_page){
 //Takes the sfax received email and matches the number to a contact
 //-----------------------------------------
 
-function dealWithSFax(subject, contact_sheet, main_page, content){   
+function deal_with_sfax(subject, contact_sheet, main_page, content){   
    var fax_number = subject.substring(subject.indexOf("+")+1,subject.indexOf("+")+17)  //Main identifier, extracted from subject
    var fax_id = content.substring(content.indexOf("*ID:* ")+6,content.indexOf("*To:*")-2)
    var recipient_number = content.substring(content.indexOf("*To:* ")+6,content.indexOf("*From:*")-2).trim()
@@ -156,7 +156,7 @@ function dealWithSFax(subject, contact_sheet, main_page, content){
      console.log("received fax from facility to ignore");
    } else {
      subject += "\n" + fax_id + "\n" + Utilities.formatDate(new Date(), "GMT-07:00", "MM/dd/yyyy")
-     addDonationRow(subject, fax_number, "Not Found", contact_sheet, main_page,"")
+     add_donation_row(subject, fax_number, "Not Found", contact_sheet, main_page,"")
    }
 }
 
@@ -167,23 +167,24 @@ function dealWithSFax(subject, contact_sheet, main_page, content){
 //and creating new rows if they dont match a fax. 
 //--------------------------------
 
-function dealWithShipped(content, main_page, pending_page, contact_sheet,data_val_sheet, tracking_db_sheet){ 
+function deal_with_shipped(content, main_page, pending_page, contact_sheet,data_val_sheet, tracking_db_sheet){ 
   console.log(content.length)
   
   if((content.indexOf("out of office") > -1)) return; //shortcuts the reply emails we might get
   
+  //TODO: these are from bertha 1.0, switch this to more robust RegExs
   var tracking_number = content.substring(content.indexOf("number")+7, content.indexOf("number")+22)
   var from_facility = content.substring(content.indexOf("from")+5, content.indexOf("was")).replace(/(\r\n|\n|\r)/gm," ").replace(/ +(?= )/g,''," ").trim() //has to remove magic newline characters for some reason
   var current_sheet_data = main_page.getDataRange().getValues();
   
-  var main_indexes = getMainPageIndexes()
+  var main_indexes = get_main_indexes()
   var index_tracking_number = main_indexes.indexTrackingNum
   var index_shipped = main_indexes.indexShippedEmail
   var index_facility = main_indexes.indexFacilityName
   var index_action = main_indexes.indexPend
   var index_resolved =  main_indexes.indexHumanIssues
 
-  var contact_indexes = getContactPageIndexes()
+  var contact_indexes = get_contact_indexes()
   var contactsheet_index_faxnumber = contact_indexes.indexFaxnumber
   var contactsheet_index_facility = contact_indexes.indexFacility
   var contactsheet_index_state = contact_indexes.indexState
@@ -220,6 +221,7 @@ function dealWithShipped(content, main_page, pending_page, contact_sheet,data_va
         need_dup = false    
 
       } else if((current_sheet_data[n][index_tracking_number].toString().length == 0) && (current_sheet_data[n][index_action].toString().indexOf("DO NOT PEND") == -1) && (current_sheet_data[n][index_action].toString().indexOf("SUPPLY REQUEST") == -1) && (current_sheet_data[n][index_action].toString().indexOf("EMAIL") == -1)){      //identifies the first row from this facility that is without tracking # and which does not say "DO NOT PEND" or isn't a supply request
+        
         main_page.getRange((n+1), (index_tracking_number+1)).setValue(tracking_number.trim())
         var shipped_contents = Utilities.formatDate(new Date(), "GMT-07:00", "MM/dd/yyyy HH:mm:ss") //keeps track of when the pickup was set              
         main_page.getRange((n+1), (index_shipped+1)).setValue(shipped_contents)
@@ -306,15 +308,15 @@ function dealWithShipped(content, main_page, pending_page, contact_sheet,data_va
      main_page.appendRow([note, "Bertha", from_facility, state, action,contact,"","","","",data_format,auto_no,issue,auto_res,tracking_number,Utilities.formatDate(new Date(), "GMT-07:00", "MM/dd/yyyy HH:mm:ss"), "", "Shipped Email","","","","","",update_command,Math.floor(Math.random() * 500000)]) //creates a sort of dummy row for a shipped email taht didn't match any faxes
      addTrackingToDB(tracking_number.trim(), from_facility.trim(), tracking_db_sheet)
      
-     autoGroup(from_facility)
+     auto_group(from_facility)
     
      
-     sendAlertEmail(5,"","",message,"")
+     send_alert_email(5,"","",message,"")
    }
    
    
    //Check the pickups page for any outstanding pickups to this facility and cancel them! 
-   checkForPickupsToCancel(pending_page,from_facility)
+   check_for_pickups_to_cancel(pending_page,from_facility)
 }
 
 
@@ -330,7 +332,7 @@ function dealWithShipped(content, main_page, pending_page, contact_sheet,data_va
 //sirum.org itself.
 //--------------------------------
 
-function checkForPickupsToCancel(pending_page,from_facility){
+function check_for_pickups_to_cancel(pending_page,from_facility){
    var pending_data = pending_page.getDataRange().getValues();
    for(var n = 0; n < pending_data.length; ++n){
      if(pending_data[n][0].toString() == from_facility.trim()){
@@ -347,7 +349,7 @@ function checkForPickupsToCancel(pending_page,from_facility){
         var message = from_facility
         message += " " + "with confirmation number " + pending_data[n][6].toString()
         if( ((date_obj_pickup - today)) > 0){ //then you need to cancel this. at them moment no way to cleanly do this, but can send email
-            sendAlertEmail(7,"","",message)
+            send_alert_email(7,"","",message)
         }     
      }
    }  
@@ -362,13 +364,13 @@ function checkForPickupsToCancel(pending_page,from_facility){
 //In charge of updating tracking numbers using the Donation Received emails. Matches by tracking number at this point.
 //--------------------------------
 
-function dealWithReceived(content, main_page){
+function deal_with_received(content, main_page){
     content = content.replace(/(\r\n|\n|\r)/gm," ").replace(/ +(?= )/g,''," ")
     var tracking_number = content.substring(content.indexOf("number")+7, content.indexOf("number")+22)
     var current_sheet_data = main_page.getDataRange().getValues();
     var facility = content.substring(content.indexOf(",")+2,content.indexOf("'s"))
     
-    var indexes = getMainPageIndexes()  
+    var indexes = get_main_indexes()  
     var index_tracking_number = indexes.indexTrackingNum
     var index_received = indexes.indexReceivedEmail
     //var indexColemanTracking = indexes.indexColemanTracking
@@ -399,7 +401,7 @@ function dealWithReceived(content, main_page){
 //When Email API is used to log donations (for example, from Pharmerica), then this function handles that.
 //---------------------
 
-function logDonationByEmail(content, contact_sheet, main_page){
+function log_donation_by_email(content, contact_sheet, main_page){
 
   var facility = content.substring(content.indexOf("Facility: ")+10, content.indexOf("Number Of")-1)
   var number_boxes = content.substring(content.indexOf("Number Of Boxes: ")+17, content.indexOf("Contact")-1)
@@ -418,7 +420,7 @@ function logDonationByEmail(content, contact_sheet, main_page){
     if(supplies_requested) supplies = content.substring(content.indexOf("Supplies:")+9, content.indexOf("END")).trim()
   }  
   
-  var indexes = getMainPageIndexes()  
+  var indexes = get_main_indexes()  
   var index_contact = indexes.indexContact
   
   var res = 1;
@@ -427,13 +429,13 @@ function logDonationByEmail(content, contact_sheet, main_page){
 
   if(number_boxes.trim() == '0'){
     Logger.log("adding supply request row")
-    res = addDonationRow("Email-Log-Supply", fake_number,facility.trim(), contact_sheet, main_page, supplies)  //the return value is 0 if there was a typo in the name
+    res = add_donation_row("Email-Log-Supply", fake_number,facility.trim(), contact_sheet, main_page, supplies)  //the return value is 0 if there was a typo in the name
     var last_row = main_page.getLastRow()
     main_page.getRange(last_row, index_contact+1).setValue(contact) //override contact sheet  
   }
     
   for(var i=0;i<parseInt(number_boxes,10);i++){   //has to do this for each box, as per the email specs
-    res = addDonationRow("Email-Log", fake_number,facility.trim(), contact_sheet, main_page, supplies)  //the return value is 0 if there was a typo in the name
+    res = add_donation_row("Email-Log", fake_number,facility.trim(), contact_sheet, main_page, supplies)  //the return value is 0 if there was a typo in the name
     var last_row = main_page.getLastRow()
     main_page.getRange(last_row, index_contact+1).setValue(contact) //override contact sheet
     
@@ -448,7 +450,7 @@ function logDonationByEmail(content, contact_sheet, main_page){
 //redon 11/2018
 //---------------
 
-function logEmailAPI(subject, contact_sheet, main_page){
+function log_email_api(subject, contact_sheet, main_page){
   var trimmed_subject = subject.replace("#Bertha","")
   if(trimmed_subject.toLowerCase().indexOf("donation contact not found") > -1){ //then it's a special not-pre-entered value
     debugEmail("[Action Required]: Cognito Contact Not Found","Received email from Cognito with subject: " + subject)
@@ -482,7 +484,7 @@ function logEmailAPI(subject, contact_sheet, main_page){
 //sirum.org and going account to account
 //-----------------------------
 
-function cancelPickup(content, main_page){
+function cancel_pickup(content, main_page){
   var facilities = []
   var lines = content.replace( /\n/g, "," ).split( "," )
   for (var i = 0; i < lines.length; i++){
@@ -498,11 +500,11 @@ function cancelPickup(content, main_page){
 
 
 //returns [state,issue,pickup_loc,supp_notes, v1_format]
-function nameContactLookup(name, contact_sheet){
+function name_contact_lookup(name, contact_sheet){
   var res = []
   var data = contact_sheet.getDataRange().getValues()
   
-  var indexes = getContactPageIndexes()  
+  var indexes = get_contact_indexes()  
 
   var contactsheet_index_faxnumber = indexes.indexFaxnumber
   var contactsheet_index_facility = indexes.indexFacility
@@ -539,14 +541,14 @@ function new_addDonationRow(key_vals, main_sheet, contact_sheet){
   }
   var date = Utilities.formatDate(new Date(), "GMT-07:00", "MM/dd/yyyy ")    
 
-  var indexes = getMainPageIndexes()
+  var indexes = get_main_indexes()
   var indexState = indexes.indexState
   var indexIssues = indexes.indexIssues
   var indexSuppliesNotes = indexes.indexSuppliesNotes
   var indexPickup = indexes.index_pickup
   var indexInSirum = indexes.indexInSirum
 
-  var contact_info = nameContactLookup(main_sheet.getRange("C"+row_num).getValue(), contact_sheet) //returns [state,issue,pickup_loc,supp_notes, v1_import_format]
+  var contact_info = name_contact_lookup(main_sheet.getRange("C"+row_num).getValue(), contact_sheet) //returns [state,issue,pickup_loc,supp_notes, v1_import_format]
 
   if(contact_info.length > 0){
     main_sheet.getRange(row_num,(indexState+1)).setDataValidation(null).setValue(contact_info[0])
@@ -565,7 +567,7 @@ function new_addDonationRow(key_vals, main_sheet, contact_sheet){
 //-------------------
 //for pharmacies: res = addDonationRow("Email-Log","Email-Log" + filename,, facility.trim(), contact_sheet, main_page, supplies)  //the return value is 0 if there was a typo in the name
 
-function addDonationRow(subject, fax_number, facility, contact_sheet, main_page, supplies){ //pass the fields of a row and it will add it. be used both for fax and email requests
+function add_donation_row(subject, fax_number, facility, contact_sheet, main_page, supplies){ //pass the fields of a row and it will add it. be used both for fax and email requests
   console.log('adding donation row: ' + subject)
       
   var state = "State Unknown" //all the default values
@@ -580,7 +582,7 @@ function addDonationRow(subject, fax_number, facility, contact_sheet, main_page,
   var colorado_forward_req = "" //will put a FORWARD in the CO Fax cell so that someone can make a note of whether they forwarded the CO Fax
   var issueAutoPop = ""
 
-  var indexes = getContactPageIndexes()  
+  var indexes = get_contact_indexes()  
 
   var contactsheet_index_faxnumber = indexes.indexFaxnumber
   var contactsheet_index_facility = indexes.indexFacility
@@ -639,7 +641,7 @@ function addDonationRow(subject, fax_number, facility, contact_sheet, main_page,
       if(attention_req.indexOf("DO NOT PEND") > -1){
         do_not_set_pickup = "DO NOT PEND"  //dont set a pickup or make a line for a fax that isnt a donatio
       } else {
-          sendAlertEmail(2,fax_number,facility,attention_req)//dont send email if it's a do-not-set-pick-up or a reminder
+          send_alert_email(2,fax_number,facility,attention_req)//dont send email if it's a do-not-set-pick-up or a reminder
       }
  }
   
@@ -653,7 +655,7 @@ function addDonationRow(subject, fax_number, facility, contact_sheet, main_page,
     if(recipient.toLowerCase().indexOf("open bible") > -1){ //we're still gonna set the pickup, but need to send an email about CO facility
       colorado_forward_req = "FORWARD ME"
       color = "purple" //color the whole row purple
-      sendAlertEmail(2,fax_number,facility,"My records show this is a Colorado facility")
+      send_alert_email(2,fax_number,facility,"My records show this is a Colorado facility")
     }
   }
         
@@ -662,7 +664,7 @@ function addDonationRow(subject, fax_number, facility, contact_sheet, main_page,
   if(facility=="Not Found"){ //Then contact not found and appropriate email must be sent
       issueToAdd = " FAX NUMBER NOT FOUND: "
       issueToAdd += fax_number
-      sendAlertEmail(1, fax_number, "","");
+      send_alert_email(1, fax_number, "","");
     
   }  else if(facility.indexOf("DELETE") > -1){ //this short circuit keeps it from adding 
       return 0
@@ -670,7 +672,7 @@ function addDonationRow(subject, fax_number, facility, contact_sheet, main_page,
   } else if(found_contact == "False" && fax_number == "Email-Log"){ //then you need an error message for the api log. can be expanded to further error checking
       //issueAutoPop = "New user submitted pharmacy form. Used the email that is stored in contacts column here - add to Salesforce and check the way name is entered here."
       //facility =  facility.replace("PHARMACY FORM ENTERED:","").trim()
-      //sendAlertEmail(3, fax_number, facility,"Pharmacy form submitted with an email that didn't match our records, entered facility name as:     ")
+      //send_alert_email(3, fax_number, facility,"Pharmacy form submitted with an email that didn't match our records, entered facility name as:     ")
       /*if((facility.indexOf("PharMerica") > -1) || (facility.toLowerCase().indexOf("polaris") > -1) || (facility.indexOf("Consonus") > -1) || (facility.indexOf("Gayco") > -1)){
         issueToAdd = " FAX NUMBER NOT FOUND: "
         issueToAdd += facility
@@ -718,7 +720,7 @@ function addDonationRow(subject, fax_number, facility, contact_sheet, main_page,
   main_page.getRange(last_row, 1, 1, main_page.getMaxColumns()).setBackground(color) //so it doesn't drag down the green of a supply request, or yellow or purple or something
 
   if(facility != "Not Found"){
-    autoGroup(facility)
+    auto_group(facility)
   }
   
   return 1 
