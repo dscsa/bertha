@@ -1,4 +1,48 @@
+function tagSFaxRows(ss,date,main_page){
+  var backend_sh = SpreadsheetApp.openById(BACKEND_ID)
 
+   //Then look at the SFax pings and process any new ones to add tracking nums to the main_page
+  var sfax_sheet = backend_sh.getSheetByName("SFax Integration")
+  var sfax_sheet_data = sfax_sheet.getDataRange().getValues()
+  
+  var index_sfax_tag = 6
+  var index_sfax_id = 3
+  var index_sfax_obj = 2
+  
+  var new_todos = {}
+  
+  for(var i = 1; i < sfax_sheet_data.length; i++){
+    if(sfax_sheet_data[i][index_sfax_tag].toString().trim().length == 0){ //make sure it's not a row we've already processed
+      
+      var fax_id = sfax_sheet_data[i][index_sfax_id].toString()
+      var obj_raw = sfax_sheet_data[i][index_sfax_obj].toString()
+      
+      if(obj_raw.indexOf('{"') == 0){ //then its an object, otherwise do nothing
+        var full_resp_obj = JSON.parse(obj_raw)
+        if(!("isSuccess" in full_resp_obj)){ //make sure its not an error object
+          new_todos[fax_id] = full_resp_obj
+        } else {
+          sfax_sheet.getRange((i+1), (index_sfax_tag+1)).setValue(date) //tag a row
+        }
+      } else {
+        sfax_sheet.getRange((i+1), (index_sfax_tag+1)).setValue(date) //tag a row
+
+      }
+      
+    }
+  }
+  
+  //new_todos is now an object with fax_ids as keys, and all the info we need for the fax in the object itself. 
+  //go to the main_page and perform relavant tagging
+  var completed_ids = performMainPageTagging(new_todos,main_page)
+  
+  var sfax_sheet_data = sfax_sheet.getDataRange().getValues()
+  for(var i = 1; i < sfax_sheet_data.length; i++){
+    if(completed_ids.indexOf(sfax_sheet_data[i][index_sfax_id].toString()) > -1){
+      sfax_sheet.getRange((i+1), (index_sfax_tag+1)).setValue(date) //tag a row
+    }
+  }
+}
 
 function performMainPageTagging(obj_to_process, main_page){
   var completed = []
@@ -12,7 +56,9 @@ function performMainPageTagging(obj_to_process, main_page){
 
   var page_data = main_page.getDataRange().getValues()
   for(var i = 1; i < page_data.length; i++){
-    if(page_data[i][indexManualTrackingNum].toString().trim().length == 0){ //only checking if we haven't already (which essentialy happens if nothing in the manual tracking num column yet
+    
+    if((page_data[i][indexManualTrackingNum].toString().trim().length == 0)
+    || (page_data[i][indexManualTrackingNum].toString().trim() == "#NO")){ //only checking if we haven't already (which essentialy happens if nothing in the manual tracking num column yet), or even if they're a no-upload row, still tag
       
       if(page_data[i][indexSFaxInfo].toString().indexOf("Sfax") > -1){ //only looking at sfax rows
         var sfax_id = page_data[i][indexSFaxInfo].toString().split("\n")[1].trim()
@@ -64,50 +110,6 @@ function makeSetStringOfArrayString(arr_string){
 
 
 
-function tagSFaxRows(ss,date,main_page){
-  var backend_sh = SpreadsheetApp.openById(BACKEND_ID)
-
-   //Then look at the SFax pings and process any new ones to add tracking nums to the main_page
-  var sfax_sheet = backend_sh.getSheetByName("SFax Integration")
-  var sfax_sheet_data = sfax_sheet.getDataRange().getValues()
-  
-  var index_sfax_tag = 6
-  var index_sfax_id = 3
-  var index_sfax_obj = 2
-  
-  var new_todos = {}
-  
-  for(var i = 1; i < sfax_sheet_data.length; i++){
-    if(sfax_sheet_data[i][index_sfax_tag].toString().trim().length == 0){ //make sure it's not a row we've already processed
-      
-      var fax_id = sfax_sheet_data[i][index_sfax_id].toString()
-      var obj_raw = sfax_sheet_data[i][index_sfax_obj].toString()
-      
-      if(obj_raw.indexOf('{"') == 0){ //then its an object, otherwise do nothing
-        var full_resp_obj = JSON.parse(obj_raw)
-        if(!("isSuccess" in full_resp_obj)){ //make sure its not an error object
-          new_todos[fax_id] = full_resp_obj
-        } else {
-          sfax_sheet.getRange((i+1), (index_sfax_tag+1)).setValue(date) //tag a row
-        }
-      } else {
-        sfax_sheet.getRange((i+1), (index_sfax_tag+1)).setValue(date) //tag a row
-
-      }
-      
-    }
-  }
-  
-  //new_todos is now an object with fax_ids as keys, and all the info we need for the fax in the object itself. 
-  //go to the main_page and perform relavant tagging
-  var completed_ids = performMainPageTagging(new_todos,main_page)
-  var sfax_sheet_data = sfax_sheet.getDataRange().getValues()
-  for(var i = 1; i < sfax_sheet_data.length; i++){
-    if(completed_ids.indexOf(sfax_sheet_data[i][index_sfax_id].toString()) > -1){
-      sfax_sheet.getRange((i+1), (index_sfax_tag+1)).setValue(date) //tag a row
-    }
-  }
-}
 
 
 //Currently not working: Integration with SFax to use their barcode reading functionality

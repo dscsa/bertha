@@ -23,8 +23,9 @@ function custom_lock(func_name){
 
 //use this to 'unlock' by removing the cache lock
 function custom_unlock(func_name){
+  //func_name = 'Auto_Log' //if you need to manually unlock, add the function name here
   console.log("trying to unlock for:" + func_name)
-
+  
   var cache = CacheService.getDocumentCache();
   cache.remove("lock") //then lyft your lock on the spreadsheet
   cache.remove("function_name")
