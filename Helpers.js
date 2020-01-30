@@ -16,7 +16,11 @@ function matched_row_by_tracking_number(sfax_number_field, shipped_email_number)
 function extractShippedText(content){
   var rx = /number ([0-9]{15}) from (.*?) was shipped/
   var res = rx.exec(content) 
-  if(res == null) return
+  if(res == null){
+    debugEmail('Error parsing shipped email', content)
+    console.log('error parsing shipped email', content)
+    return res
+  }
   return [res[1], res[2]]
 }
 
