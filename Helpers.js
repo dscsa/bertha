@@ -1,5 +1,28 @@
 //----------------------------------HELPER FUNCTIONS----------------------------------------------------------------------------------------------
 
+//compares a full trcking number with the sfax barcode filled field. helpful in matching rows if one exists for exactly that number already
+function matched_row_by_tracking_number(sfax_number_field, shipped_email_number){
+  var rx = /[0-9]{6}/
+  var res = rx.exec(sfax_number_field)
+  if(res !== null){
+    Logger.log(~ shipped_email_number.indexOf(res[0]))
+    return ~ shipped_email_number.indexOf(res[0])
+  }
+}
+
+
+//Looks at shipped emails to extract the tracking number and facility that shipped.
+//USed in tagging rows on the main page
+function extractShippedText(content){
+  var rx = /number ([0-9]{15}) from (.*?) was shipped/
+  var res = rx.exec(content) 
+  if(res == null) return
+  return [res[1], res[2]]
+}
+
+
+
+
 //Looks at the Data Validation sheet column J to see all the state fields to ignore
 //when pending the coleman to-dos
 function getPharmacyNames(data_val_sheet){

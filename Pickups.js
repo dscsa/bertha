@@ -42,13 +42,13 @@ function pend_pickups(start){
   //get pickup and issue from the main sheet, not contacts. Only get id from contacts.   
   var main_indexes = get_main_indexes()  
   
-  var indexFacility = indexes.indexFacilityName
-  var indexPickup = indexes.index_pickup
-  var indexContact = indexes.indexContact
-  var indexIssue = indexes.indexIssues
-  var indexRawFax = indexes.indexRawFax
-  var indexAction = indexes.indexPend
-  var indexInSirum = indexes.indexInSirum
+  var indexFacility = main_indexes.indexFacilityName
+  var indexPickup = main_indexes.index_pickup
+  var indexContact = main_indexes.indexContact
+  var indexIssue = main_indexes.indexIssues
+  var indexRawFax = main_indexes.indexRawFax
+  var indexAction = main_indexes.indexPend
+  var indexInSirum = main_indexes.indexInSirum
 
   
   var contact_indexes = get_contact_indexes()
