@@ -4,7 +4,6 @@
 
 function auto_log(start) { //Handles the GMail boilerplate and delagates necessary tasks
  
-//--------------------------Beginning of boiler plate------------------------------------------------------------
   start = start || 0;
   
   var ss = SpreadsheetApp.openById(BERTHA_ID);
@@ -145,7 +144,6 @@ function deal_with_missed_pickups(content, main_page){
 //dealWithSFax
 //Takes the sfax received email and matches the number to a contact
 //-----------------------------------------
-
 function deal_with_sfax(subject, contact_sheet, main_page, content){   
    var fax_number = subject.substring(subject.indexOf("+")+1,subject.indexOf("+")+17)  //Main identifier, extracted from subject
    var fax_id = content.substring(content.indexOf("*ID:* ")+6,content.indexOf("*To:*")-2)
@@ -166,162 +164,155 @@ function deal_with_sfax(subject, contact_sheet, main_page, content){
 //In charge of updating tracking numbers using the Donation Shipped emails 
 //and creating new rows if they dont match a fax. 
 //--------------------------------
-
 function deal_with_shipped(content, main_page, pending_page, contact_sheet,data_val_sheet, tracking_db_sheet){ 
-  console.log(content.length)
-  
+    
   if((content.indexOf("out of office") > -1)) return; //shortcuts the reply emails we might get
   
-  //TODO: these are from bertha 1.0, switch this to more robust RegExs
-  var tracking_number = content.substring(content.indexOf("number")+7, content.indexOf("number")+22)
-  var from_facility = content.substring(content.indexOf("from")+5, content.indexOf("was")).replace(/(\r\n|\n|\r)/gm," ").replace(/ +(?= )/g,''," ").trim() //has to remove magic newline characters for some reason
+  var extraction_result = extractShippedText(content)
+  if(extraction_result == null) return
+  var [tracking_number, from_facility] = extraction_result
+  
   var current_sheet_data = main_page.getDataRange().getValues();
   
   var main_indexes = get_main_indexes()
-  var index_tracking_number = main_indexes.indexTrackingNum
-  var index_shipped = main_indexes.indexShippedEmail
-  var index_facility = main_indexes.indexFacilityName
-  var index_action = main_indexes.indexPend
-  var index_resolved =  main_indexes.indexHumanIssues
-
   var contact_indexes = get_contact_indexes()
-  var contactsheet_index_faxnumber = contact_indexes.indexFaxnumber
-  var contactsheet_index_facility = contact_indexes.indexFacility
-  var contactsheet_index_state = contact_indexes.indexState
-  var contactsheet_index_pickup = contact_indexes.indexPickup
-  var contactsheet_index_issue = contact_indexes.indexIssue
-  var contactsheet_index_contact = contact_indexes.indexContact
-  var contactsheet_index_id = contact_indexes.indexId
-  var contactsheet_index_last_donation_date = contact_indexes.indexLastDonationDate
-  var contactsheet_index_supplies_notes = contact_indexes.indexSuppliesNotes
-  var contactsheet_index_salesforce_contacts = contact_indexes.indexSalesforceContacts
-  var contactsheet_index_import_format = contact_indexes.indexImportFormat
-  var contactsheet_index_all_emails = contact_indexes.indexAllEmails
-
-
   
-  var coleman_exclude_accounts = getPharmacyNames(data_val_sheet)
   var date = Utilities.formatDate(new Date(), "GMT-07:00", "MM/dd/yyyy ")    
 
-  console.log("HERE NOW")
-  console.log(tracking_number)
-  console.log(from_facility)
-  
-  var found_row = 0
+  var found_row_from_facility_today = -1
   var need_dup = true
   var match_facility = false
+  var indexRowToAdd = -1
   
-  for(var n=0;n<current_sheet_data.length;n++){  //find the row of this facility   
+  //Sweep the main page for a few different scenarios
+  
+  for(var n=1;n<current_sheet_data.length;n++){  //find the row of this facility   
     
-    if(current_sheet_data[n][index_facility].toString().trim().toUpperCase() == from_facility.trim().toUpperCase()){
+    if(current_sheet_data[n][main_indexes.indexFacilityName].toString().trim().toUpperCase() == from_facility.trim().toUpperCase()){
+      
       match_facility = true
       
-      if(current_sheet_data[n][index_tracking_number].toString().trim() == tracking_number.trim()){ //since one email for donation shipped is sent to a bunch of people form that facility, there will be copies of the tracking, but since you insert top-bottom then you will see a copy this way, and then ignore the email
-        n = current_sheet_data.length
-        need_dup = false    
+      if(current_sheet_data[n][main_indexes.indexTrackingNum].toString().trim() == tracking_number.trim()){ //since one email for donation shipped is sent to a bunch of people form that facility, there will be copies of the tracking, but since you insert top-bottom then you will see a copy this way, and then ignore the email
+        return //then don't wanna make any edits
 
-      } else if((current_sheet_data[n][index_tracking_number].toString().length == 0) && (current_sheet_data[n][index_action].toString().indexOf("DO NOT PEND") == -1) && (current_sheet_data[n][index_action].toString().indexOf("SUPPLY REQUEST") == -1) && (current_sheet_data[n][index_action].toString().indexOf("EMAIL") == -1)){      //identifies the first row from this facility that is without tracking # and which does not say "DO NOT PEND" or isn't a supply request
-        
-        main_page.getRange((n+1), (index_tracking_number+1)).setValue(tracking_number.trim())
-        var shipped_contents = Utilities.formatDate(new Date(), "GMT-07:00", "MM/dd/yyyy HH:mm:ss") //keeps track of when the pickup was set              
-        main_page.getRange((n+1), (index_shipped+1)).setValue(shipped_contents)
-        if(current_sheet_data[n][index_action].toString().length == 0){ //then we never pended it, so it was unexpected but auto-resolved
-          main_page.getRange((n+1), (index_action+1)).setValue("UNEXPECTED SHIPMENT")
-          main_page.getRange((n+1), (index_resolved+1)).setValue("Auto-Resolved because shipped before pickup was pended.")
+      } else if((current_sheet_data[n][main_indexes.indexTrackingNum].toString().length == 0) && (current_sheet_data[n][main_indexes.indexPend].toString().indexOf("DO NOT PEND") == -1) && (current_sheet_data[n][main_indexes.indexPend].toString().indexOf("SUPPLY REQUEST") == -1) && (current_sheet_data[n][main_indexes.indexPend].toString().indexOf("EMAIL") == -1)){      //identifies the first row from this facility that is without tracking # and which does not say "DO NOT PEND" or isn't a supply request
+        if(matched_row_by_tracking_number(current_sheet_data[n][main_indexes.indexColemanTracking].toString().trim(), tracking_number) //either its the exact row, in which case overwrite indexRowToAdd, or its the first row from this facility, which we keep
+           || (indexRowToAdd == -1)){
+          indexRowToAdd = n 
         }
-        addTrackingToDB(tracking_number.trim(), from_facility.trim(), tracking_db_sheet)
-        n = current_sheet_data.length  //so that it doesnt update all fields, stop after the first one
         need_dup = false
         
       } else { //then its a row with a donation from this facility, but already linked to one tracking number. Want to check the date stamps
         //Here want to distinguish between if, for example, you had a bunch of boxes in one shipment you should
         //group together, or if its just a box that shipped without your knowledge. In the case where you get a
         //shipment without a fax, you need to create a row at the bottom, not lose it up in the sheet.
-        //So you check column 11, the shipped one and look for the date, and only set found_row = n if the date is today
+        //So you check column 11, the shipped one and look for the date, and only set found_row_from_facility_today = n if the date is today
         //since that means that in this same batch, there were other boxes shipped today that we knew to expect
-        var shipped_cell = current_sheet_data[n][index_shipped].toString()
+        var shipped_cell = current_sheet_data[n][main_indexes.indexShippedEmail].toString()
         var date_shipped = shipped_cell.substring(0,10)
         var today = Utilities.formatDate(new Date(), "GMT-07:00", "MM/dd/yyyy")
-        if(date_shipped == today){
-          found_row = n
-        }
+        if(date_shipped == today) found_row_from_facility_today = n
       }
-    }          
-   }  
-   
-   //If you get here and the following fields are both tru, there was no row to link to a tracking number but there were others 
-   //from the facility. So it's probably that the fax had more than one coversheet inside of it, and you need to create a new row
-   //just like the last one used, and input the new tracking number.
-   
-   if(need_dup && (found_row > 0)){
-     duplicate_row_below(main_page,found_row) //a helper function that duplicates the last row of this facility (which will be in the same shipment
-     main_page.getRange((found_row+2),(index_tracking_number+1)).setValue(tracking_number.trim())
-     addTrackingToDB(tracking_number.trim(), from_facility.trim(), tracking_db_sheet)     
-   } 
-   
-   //If you get here, then we've got no instance of that facility showing up in the sheet OR there are no other rows/boxes from today.
-   //It might be that we don't have it in my contacts list, which might depend on someone in the future correcting the spelling of a facility name
-   //and we don't want to lose the tracking info in that case. So we need to keep a log of unlinked tracking numbers 
-   //and their facilities, since there shouldnt be any mysterious shipped emails. So we will directly add a row with the name
-   //and the tracking number. And send an email about this. So we ALWAYS keep track of the shipped emails.
-   //The second logic test here accounts for the case where the row is found elsewhere but it's not from today, but dont want to lose a 
-   //shipped email from today if you can't match it with any other emails from today. This happens a lot with Worthington
-   if((!match_facility) || (match_facility && (found_row == 0) && (need_dup))){
-     //check if it's a facility we even have, in which case update some info, otherwise make a note
-     var note = "NOT MATCHED TO A ROW & NOT IN DB"
-     var data = contact_sheet.getDataRange().getValues();
-     var state = "?"
-     var action = "?"
-     var contact = "?"
-     var message = "Could not match " + from_facility + "with how any contact is written. I put their donation with tracking number " + tracking_number + " in a dummy row. Please sort this all out."
-     var issue = ""
-     var data_format = ""
-     var update_command = "  FAX NUMBER NOT FOUND: " + from_facility
-     for(var i = 0; i < data.length; ++i){
-       if(data[i][contactsheet_index_facility].toString().toLowerCase().indexOf(from_facility.trim().toLowerCase()) > -1){ //then we have the contact, just didn't have a fax. So it's a different situation
-         state = data[i][contactsheet_index_state].toString()
-         action = data[i][contactsheet_index_issue].toString()
-         contact = data[i][contactsheet_index_contact].toString()
-         data_format = data[i][contactsheet_index_import_format].toString()
-         note = "UNEXPECTED SHIPMENT"
-         issue = "UNEXPECTED SHIPMENT"
-         message = "Got a shipped email from " + from_facility + "but I wasn't expecting it, so I had to create a new row. Check it out."
-         update_command = ""
-       }
-     }
-     
-     var auto_res = ""
-     var auto_no = ""
-     
-     if(data_format.length == 0){
-       if(note.indexOf('NOT IN DB') == -1){
-         issue += " Contact doesn't have a specific V1 import format on Salesforce. Double check Donor is in 2-Contacts Sheet";
-       }
-     } else {
-       data_format += " " + date
-       if(data_format.toLowerCase().indexOf("coleman") == -1) {
-         auto_res = "Auto-Resolved because facility data format is " + data_format
-         auto_no = "#NO"
-       }
-     }
-     
-     main_page.appendRow([note, "Bertha", from_facility, state, action,contact,"","","","",data_format,auto_no,issue,auto_res,tracking_number,Utilities.formatDate(new Date(), "GMT-07:00", "MM/dd/yyyy HH:mm:ss"), "", "Shipped Email","","","","","",update_command,Math.floor(Math.random() * 500000)]) //creates a sort of dummy row for a shipped email taht didn't match any faxes
-     addTrackingToDB(tracking_number.trim(), from_facility.trim(), tracking_db_sheet)
-     
-     auto_group(from_facility)
-    
-     
-     send_alert_email(5,"","",message,"")
+    }   
    }
    
+  
+  //Now that we've checked the main page, there's a few different scenarios we need to be able to handle
+  
+  if(indexRowToAdd > -1){
+     //In this case, you simply found a row where we can store that tracking number. Either the first/only row from that facility, or the one that matches the Sfax barcode
+     log_shipped_info(indexRowToAdd, main_page, current_sheet_data, main_indexes, tracking_number)
+  
+  } else if(need_dup && (found_row_from_facility_today > -1)){
+     //If you get here and the following fields are both tru, there was no row to link to a tracking number but there were others 
+     //from the facility. So it's probably that the fax had more than one coversheet inside of it, and you need to create a new row
+     //just like the last one used, and input the new tracking number.
+     
+     duplicate_row_below(main_page,found_row_from_facility_today) //a helper function that duplicates the last row of this facility (which will be in the same shipment
+     main_page.getRange((found_row_from_facility_today+2),(main_indexes.indexTrackingNum+1)).setValue(tracking_number.trim())
+     //addTrackingToDB(tracking_number.trim(), from_facility.trim(), tracking_db_sheet)    //TODO uncomment  
+  
+  } else if((!match_facility) || (match_facility && (found_row_from_facility_today == -1) && (need_dup))){
+     //If you get here, then we've got no instance of that facility showing up in the sheet OR there are no other rows/boxes from today.
+     //It might be that we don't have it in my contacts list, which might depend on someone in the future correcting the spelling of a facility name
+     //and we don't want to lose the tracking info in that case. So we need to keep a log of unlinked tracking numbers 
+     //and their facilities, since there shouldnt be any mysterious shipped emails. So we will directly add a row with the name
+     //and the tracking number. And send an email about this. So we ALWAYS keep track of the shipped emails.
+     //The second logic test here accounts for the case where the row is found elsewhere but it's not from today, but dont want to lose a 
+     //shipped email from today if you can't match it with any other emails from today. This happens a lot with Worthington
+    
+    log_unexpected_shipment_info(contact_sheet, tracking_number, from_facility, contact_indexes, main_page, date)
+  }
    
-   //Check the pickups page for any outstanding pickups to this facility and cancel them! 
-   check_for_pickups_to_cancel(pending_page,from_facility)
+   check_for_pickups_to_cancel(pending_page,from_facility) //Check the pickups page for any outstanding pickups to this facility and cancel them! 
 }
 
 
+//Handles writing shipped email info the main page and handling appropriate cases
+function log_shipped_info(indexRowToAdd, main_page, main_page_data, main_indexes, tracking_number){
+  main_page.getRange((indexRowToAdd+1), (main_indexes.indexTrackingNum+1)).setValue(tracking_number.trim())
+  
+  var shipped_date = Utilities.formatDate(new Date(), "GMT-07:00", "MM/dd/yyyy HH:mm:ss") //keeps track of when the pickup was set              
+  main_page.getRange((indexRowToAdd+1), (main_indexes.indexShippedEmail+1)).setValue(shipped_date)
+  
+  if(main_page_data[indexRowToAdd][main_indexes.indexPend].toString().length == 0){ //then we never pended it, so it was unexpected but auto-resolved
+     main_page.getRange((indexRowToAdd+1), (main_indexes.indexPend+1)).setValue("UNEXPECTED SHIPMENT")
+     main_page.getRange((indexRowToAdd+1), (main_indexes.indexHumanIssues+1)).setValue("Auto-Resolved because shipped before pickup was pended.")
+  }
+  
+  addTrackingToDB(tracking_number.trim(), from_facility.trim(), tracking_db_sheet) //TODO uncomment
+}
 
 
+//handles logging shipments we weren't expecting, either from a facility Bertha knows or doesnt
+function log_unexpected_shipment_info(contact_sheet, tracking_number, from_facility, contact_indexes, main_page, date){
+  console.log("unexpected!")
+  
+  //check if it's a facility we even have, in which case update some info, otherwise make a note
+  var note = "NOT MATCHED TO A ROW & NOT IN DB"
+  var data = contact_sheet.getDataRange().getValues();
+  var state = "?"
+  var action = "?"
+  var contact = "?"
+  var message = "Could not match " + from_facility + "with how any contact is written. I put their donation with tracking number " + tracking_number + " in a dummy row. Please sort this all out."
+  var issue = ""
+  var data_format = ""
+  var update_command = "  FAX NUMBER NOT FOUND: " + from_facility
+   
+  for(var i = 0; i < data.length; ++i){
+   if(data[i][contact_indexes.indexFacility].toString().toLowerCase().indexOf(from_facility.trim().toLowerCase()) > -1){ //then we have the contact, just didn't have a fax. So it's a different situation
+     state = data[i][contact_indexes.indexState].toString()
+     action = data[i][contact_indexes.indexIssue].toString()
+     contact = data[i][contact_indexes.indexContact].toString()
+     data_format = data[i][contact_indexes.indexImportFormat].toString()
+     note = "UNEXPECTED SHIPMENT"
+     issue = "UNEXPECTED SHIPMENT"
+     message = "Got a shipped email from " + from_facility + "but I wasn't expecting it, so I had to create a new row. Check it out."
+     update_command = ""
+   }
+  }
+   
+  var auto_res = ""
+  var auto_no = ""
+   
+  if(data_format.length == 0){
+     if(note.indexOf('NOT IN DB') == -1){
+       issue += " Contact doesn't have a specific V1 import format on Salesforce. Double check Donor is in 2-Contacts Sheet";
+     }
+  } else {
+     data_format += " " + date
+     if(data_format.toLowerCase().indexOf("coleman") == -1) {
+       auto_res = "Auto-Resolved because facility data format is " + data_format
+       auto_no = "#NO"
+     }
+  }
+   
+  main_page.appendRow([note, "Bertha", from_facility, state, action,contact,"","","","",data_format,auto_no,issue,auto_res,tracking_number,Utilities.formatDate(new Date(), "GMT-07:00", "MM/dd/yyyy HH:mm:ss"), "", "Shipped Email","","","","","",update_command,Math.floor(Math.random() * 500000)]) //creates a sort of dummy row for a shipped email taht didn't match any faxes
+  //addTrackingToDB(tracking_number.trim(), from_facility.trim(), tracking_db_sheet) //TODO uncomment
+   
+   auto_group(from_facility)
+   send_alert_email(5,"","",message,"")
+}
 
 
 
