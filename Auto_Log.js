@@ -165,7 +165,9 @@ function deal_with_sfax(subject, contact_sheet, main_page, content){
 //and creating new rows if they dont match a fax. 
 //--------------------------------
 function deal_with_shipped(content, main_page, pending_page, contact_sheet,data_val_sheet, tracking_db_sheet){ 
-    
+  console.log("dealing with shipped:")
+  console.log(content.replace(/(\r\n|\n|\r)/gm," ").replace(/ +(?= )/g,''," "))
+  
   if((content.indexOf("out of office") > -1)) return; //shortcuts the reply emails we might get
   
   var extraction_result = extractShippedText(content)
@@ -221,7 +223,7 @@ function deal_with_shipped(content, main_page, pending_page, contact_sheet,data_
   
   if(indexRowToAdd > -1){
      //In this case, you simply found a row where we can store that tracking number. Either the first/only row from that facility, or the one that matches the Sfax barcode
-     log_shipped_info(indexRowToAdd, main_page, current_sheet_data, main_indexes, tracking_number)
+     log_shipped_info(indexRowToAdd, main_page, current_sheet_data, main_indexes, tracking_number, from_facility)
   
   } else if(need_dup && (found_row_from_facility_today > -1)){
      //If you get here and the following fields are both tru, there was no row to link to a tracking number but there were others 
@@ -249,7 +251,7 @@ function deal_with_shipped(content, main_page, pending_page, contact_sheet,data_
 
 
 //Handles writing shipped email info the main page and handling appropriate cases
-function log_shipped_info(indexRowToAdd, main_page, main_page_data, main_indexes, tracking_number){
+function log_shipped_info(indexRowToAdd, main_page, main_page_data, main_indexes, tracking_number, from_facility){
   main_page.getRange((indexRowToAdd+1), (main_indexes.indexTrackingNum+1)).setValue(tracking_number.trim())
   
   var shipped_date = Utilities.formatDate(new Date(), "GMT-07:00", "MM/dd/yyyy HH:mm:ss") //keeps track of when the pickup was set              
