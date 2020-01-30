@@ -143,7 +143,7 @@ function alternative_deal_with_shipped(content, main_page, pending_page, contact
      //from the facility. So it's probably that the fax had more than one coversheet inside of it, and you need to create a new row
      //just like the last one used, and input the new tracking number.
      
-     duplicateRowBelow(main_page,found_row_from_facility_today) //a helper function that duplicates the last row of this facility (which will be in the same shipment
+     duplicate_row_below(main_page,found_row_from_facility_today) //a helper function that duplicates the last row of this facility (which will be in the same shipment
      main_page.getRange((found_row_from_facility_today+2),(main_indexes.indexTrackingNum+1)).setValue(tracking_number.trim())
      //addTrackingToDB(tracking_number.trim(), from_facility.trim(), tracking_db_sheet)    //TODO uncomment  
   

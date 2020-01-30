@@ -135,12 +135,12 @@ function getDateFromString(just_date){
 
 
 
-//duplicateRowBelow(page,n)
+//duplicate_row_below(page,n)
 //Duplicates row n right below itself, copying over the non-unique values and the date shipped. Used for creating a new row if 
 //there are more tracking numbers than rows, and we receive "Donation Shipped" emails for more tracking numbers than
 //there is space. This is how we account for an Sfax with multiple coversheets.
 //---------------------------------------------
-function duplicateRowBelow(page,n){
+function duplicate_row_below(page,n){
      page.insertRowAfter(n+1)
      var data = page.getDataRange().getValues();
 

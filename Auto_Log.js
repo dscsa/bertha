@@ -254,7 +254,7 @@ function deal_with_shipped(content, main_page, pending_page, contact_sheet,data_
    //just like the last one used, and input the new tracking number.
    
    if(need_dup && (found_row > 0)){
-     duplicateRowBelow(main_page,found_row) //a helper function that duplicates the last row of this facility (which will be in the same shipment
+     duplicate_row_below(main_page,found_row) //a helper function that duplicates the last row of this facility (which will be in the same shipment
      main_page.getRange((found_row+2),(index_tracking_number+1)).setValue(tracking_number.trim())
      addTrackingToDB(tracking_number.trim(), from_facility.trim(), tracking_db_sheet)     
    } 
